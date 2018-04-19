@@ -19,6 +19,11 @@ spring:
 logstash:
   uri: ${LOGSTASH_URI:localhost:5000}
 
+nimble:
+  data-channel:
+    sensorthings:
+      url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
+
 ---
 
 spring:
@@ -34,7 +39,8 @@ spring:
   datasource:
     name: channeldb
     driverClassName: org.h2.Driver
-    url: jdbc:h2:~/channeldb;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE;DB_CLOSE_DELAY=-1
+#    url: jdbc:h2:file:~/channeldb;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:~/channeldb
     initialize: true
     username: sa
     password: sa
