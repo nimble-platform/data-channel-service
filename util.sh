@@ -8,6 +8,10 @@ if [[ "$1" = "local" ]]; then
     mvn -f data-channel-service/pom.xml docker:build
 	docker-compose --project-name data-channel-setup up --build --force-recreate
 
+elif [ "$1" == "gost-local" ]; then
+
+	docker-compose --project-name data-channel-setup up --build --force-recreate gost gost-db gost-dashboard
+
 elif [ "$1" == "build" ]; then
 
     mvn clean install -DskipTests

@@ -38,7 +38,8 @@ public class ChannelController {
             @ApiResponse(code = 400, message = "Error while creating channel")})
     @RequestMapping(value = "/", produces = {"application/json"}, method = RequestMethod.POST)
     ResponseEntity<Thing> createChannel(
-            @ApiParam(value = "Channel configuration", required = true) @RequestBody ChannelContract channelContract) throws ServiceFailureException {
+            @ApiParam(value = "Channel configuration", required = true) @RequestBody ChannelContract channelContract,
+            @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException {
 
         Thing createdThing = sensorThingsContracts.createThingFromContract(channelContract);
 
