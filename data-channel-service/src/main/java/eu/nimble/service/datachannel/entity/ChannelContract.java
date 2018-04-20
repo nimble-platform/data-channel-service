@@ -1,7 +1,9 @@
 package eu.nimble.service.datachannel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
+@ApiModel(value = "ChannelContract", discriminator = "CC")
 public class ChannelContract {
     @Id
     @JsonIgnore
@@ -17,38 +20,48 @@ public class ChannelContract {
     private Long id;
 
     @NotNull
+    @ApiModelProperty(value = "Description and purpose of data channel", required = true)
     private String description;
 
     @NotNull
+    @ApiModelProperty(value = "Name of data channel", required = true)
     private String name;
 
     @NotNull
     @ElementCollection(targetClass=String.class)
+    @ApiModelProperty(value = "List of datastream id associated with data channel", required = true)
     private Set<String> dataStreamIDs;
 
     @NotNull
+    @ApiModelProperty(value = "ID of producing company", required = true)
     private String producerCompanyID;
 
     @NotNull
     @ElementCollection(targetClass=String.class)
+    @ApiModelProperty(value = "IDs of consuming companies", required = true)
     private Set<String> consumerCompanyIDs;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
+    @ApiModelProperty(value = "Opening date/time of data channel", required = true)
     private java.util.Date startDateTime;
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
+    @ApiModelProperty(value = "Closing date/time of data channel", required = true)
     private java.util.Date endDateTime;
 
     @NotNull
+    @ApiModelProperty(value = "Schema of messages exchange via data channel", required = true, allowableValues = "sensorthings")
     private String messageSchema;
 
     @NotNull
+    @ApiModelProperty(value = "Used technology", required = true, allowableValues = "kafka")
     private String technology;
 
     @NotNull
     @ElementCollection
+    @ApiModelProperty(value = "Meta information of used technology")
     private Map<String, String> technologyMeta;
 
     public Long getId() {

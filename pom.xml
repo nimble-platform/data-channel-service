@@ -17,6 +17,7 @@
     </parent>
 
     <modules>
+        <module>libs/common</module>
         <module>data-channel-service</module>
     </modules>
 </project>

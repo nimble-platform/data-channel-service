@@ -1,6 +1,8 @@
 package eu.nimble.service.datachannel.controller;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
+import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.Thing;
 import eu.nimble.service.datachannel.entity.ChannelContract;
 import eu.nimble.service.datachannel.entity.CompanyChannels;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -37,9 +40,14 @@ public class ChannelController {
             @ApiResponse(code = 200, message = "Channel created", response = Thing.class),
             @ApiResponse(code = 400, message = "Error while creating channel")})
     @RequestMapping(value = "/", produces = {"application/json"}, method = RequestMethod.POST)
-    ResponseEntity<Thing> createChannel(
+    ResponseEntity<?> createChannel(
             @ApiParam(value = "Channel configuration", required = true) @RequestBody ChannelContract channelContract,
-            @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException {
+            @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
+
+        // check if company id matches
+        String companyId = identityClient.getCompanyId(bearer);
+        if (channelContract.getProducerCompanyID().equals(companyId) == false)
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         Thing createdThing = sensorThingsContracts.createThingFromContract(channelContract);
 
@@ -54,9 +62,17 @@ public class ChannelController {
     @RequestMapping(value = "/{channelID}", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> getChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable Long channelID,
-            @RequestHeader(value = "Authorization") String bearer) {
+            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException, ServiceFailureException {
 
-        // ToDo: check if proper accesstoken (related company is producer or consumer)
+        // get contract of companies
+        String companyId = identityClient.getCompanyId(bearer);
+        Set<Thing> thingsOfCompany = sensorThingsContracts.producerThingsForCompany(companyId);
+        thingsOfCompany.addAll(sensorThingsContracts.consumerThingsForCompany(companyId));
+
+        // check whether user is allowed to get channel
+        Set<String> contractIDs = thingsOfCompany.stream().map(thing -> thing.getId().toString()).collect(Collectors.toSet());
+        if (contractIDs.contains(String.valueOf(channelID)) == false)
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         Thing thing = null;
         try {
@@ -77,7 +93,7 @@ public class ChannelController {
             @ApiResponse(code = 200, message = "Channels found", response = CompanyChannels.class),
             @ApiResponse(code = 400, message = "Error while fetching channels")})
     @RequestMapping(value = "/company", produces = {"application/json"}, method = RequestMethod.GET)
-    ResponseEntity<?> getChannelForCompany(@RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException {
+    ResponseEntity<?> getChannelForCompany(@RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
 
         // ToDo: check if proper accesstoken (e.g. check role)
 

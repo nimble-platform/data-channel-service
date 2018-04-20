@@ -23,6 +23,8 @@ nimble:
   data-channel:
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
+  identity:
+    service-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
 
 ---
 
