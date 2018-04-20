@@ -1,40 +1,32 @@
-# Microservice Example using Java 8
-**ServiceID**: java-microservice-example
+# Data Channel Serive
+**ServiceID**: data-channel-service
 
-Example implementation for a microservice written in Java and the Spring Boot framework.
+Service for managing data channel contracts.
   
-## Configuration
+## Setup
 
-Base configuration can be found at src/main/resources/application.properties and bootstrap.yml.
-[Spring Cloud Config](https://cloud.spring.io/spring-cloud-config/) is used for central configuration management. A central configuration is hosted on [https://github.com/nimble-platform/cloud-config](https://github.com/nimble-platform/cloud-config)
-and injected during startup.
+Run `mvn clean install` in the root of the project for building the application.
 
-## Swagger
+### Docker
 
-The Example API is designed using the [swagger.io editor](http://editor.swagger.io) (file: src/main/resources/api.yml) and the code generator for the Spring framework. 
-The Maven plugin (swagger-codegen-maven-plugin) is used to generate defined interfaces automatically in each Maven build.
+The file `docker-compose.yml` sets up a composition of necessary services (e.g. GOST), which can be used for local development.
 
-## How-to
+Run
 
-### Service build and startup
+```
+./util.sh local
+```
 
- ```bash
- # standalone
- mvn clean spring-boot:run
- 
- # in docker environment from core cloud infrastructure using 8085 as internal port
- mvn clean package docker:build -P docker
- docker run -p 8081:8085 nimbleplatform/java-microservice-example
- ```
- The according Dockerfile can be found at src/main/docker/Dockerfile.
- 
-### Example requests
- ```bash
- # get
- curl http://localhost:8081/example
- 
- # post
- curl -H "Content-Type: application/json" -d '{"prop1":"Jorge Lorenzo","prop2":99}' http://localhost:8081/example
- ```
- ---
-The project leading to this application has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 723810.
+for building the application and start necessa.ry services via Docker.
+
+**Depencencies**:
+
+* **Docker**: Version 18.03.0-ce
+* **Docker-compose**: Version 1.20
+* **Apache Maven**: Version 3.5.3
+
+### Important Endpoints
+
+* **Swagger Documentation**: [http://localhost:9099/swagger-ui.html#/](http://localhost:9099/swagger-ui.html#/)
+* **GOST Dashboard**: [http://localhost:8081/#/things](http://localhost:8081/#/things)
+

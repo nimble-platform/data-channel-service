@@ -3,7 +3,9 @@
 set -e    # Exits immediately if a command exits with a non-zero status.
 
 if [[ "$1" = "local" ]]; then
-	export HOSTNAME=`hostname`
+
+    mvn clean install -DskipTests
+    mvn -f data-channel-service/pom.xml docker:build
 	docker-compose --project-name data-channel-setup up --build --force-recreate
 
 elif [ "$1" == "build" ]; then
