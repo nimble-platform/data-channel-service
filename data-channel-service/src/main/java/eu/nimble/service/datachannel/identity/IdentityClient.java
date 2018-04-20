@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 public class IdentityClient {
 
     public String getCompanyId(String accessToken) {
+        // ToDo: implement
         return "9999";
     }
 }

@@ -5,7 +5,7 @@ import de.fraunhofer.iosb.ilt.sta.model.Thing;
 import eu.nimble.service.datachannel.entity.ChannelContract;
 import eu.nimble.service.datachannel.entity.CompanyChannels;
 import eu.nimble.service.datachannel.identity.IdentityClient;
-import eu.nimble.service.datachannel.sensorthings.SensorThingsClient;
+import eu.nimble.service.datachannel.sensorthings.SensorThingsContracts;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class ChannelController {
     private static Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
     @Autowired
-    private SensorThingsClient sensorThingsClient;
+    private SensorThingsContracts sensorThingsContracts;
 
     @Autowired
     private  IdentityClient identityClient;
@@ -41,7 +41,7 @@ public class ChannelController {
             @ApiParam(value = "Channel configuration", required = true) @RequestBody ChannelContract channelContract,
             @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException {
 
-        Thing createdThing = sensorThingsClient.createThingFromContract(channelContract);
+        Thing createdThing = sensorThingsContracts.createThingFromContract(channelContract);
 
         return new ResponseEntity<>(createdThing, HttpStatus.OK);
     }
@@ -60,7 +60,7 @@ public class ChannelController {
 
         Thing thing = null;
         try {
-            thing = sensorThingsClient.findThing(channelID);
+            thing = sensorThingsContracts.findThing(channelID);
         } catch (ServiceFailureException e) {
             logger.error("Error while fetching thing with ID {}", channelID);
         }
@@ -85,10 +85,10 @@ public class ChannelController {
         String companyId = identityClient.getCompanyId(bearer);
 
         // get producer channels
-        Set<Thing> producerThings = sensorThingsClient.producerThingsForCompany(companyId);
+        Set<Thing> producerThings = sensorThingsContracts.producerThingsForCompany(companyId);
 
         // get consumer channels
-        Set<Thing> consumingThings = sensorThingsClient.consumerThingsForCompany(companyId);
+        Set<Thing> consumingThings = sensorThingsContracts.consumerThingsForCompany(companyId);
 
         return new ResponseEntity<>(new CompanyChannels(producerThings, consumingThings), HttpStatus.OK);
     }

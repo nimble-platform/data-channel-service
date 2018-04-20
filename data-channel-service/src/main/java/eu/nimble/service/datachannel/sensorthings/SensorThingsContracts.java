@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.*;
 
 @Component
-public class SensorThingsClient {
+public class SensorThingsContracts {
 
     @Value("${nimble.data-channel.sensorthings.url}")
     private String sensorThingsServerUrl;
