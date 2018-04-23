@@ -11,6 +11,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Contract for defining a data channel.
+ *
+ * @author Johannes Innerbichler
+ */
 @Entity
 @ApiModel(value = "ChannelContract", discriminator = "CC")
 public class ChannelContract {
@@ -52,11 +57,11 @@ public class ChannelContract {
     private java.util.Date endDateTime;
 
     @NotNull
-    @ApiModelProperty(value = "Schema of messages exchange via data channel", required = true, allowableValues = "sensorthings")
+    @ApiModelProperty(value = "Schema of messages exchanged via data channel", required = true, allowableValues = "sensorthings")
     private String messageSchema;
 
     @NotNull
-    @ApiModelProperty(value = "Used technology", required = true, allowableValues = "kafka")
+    @ApiModelProperty(value = "Used technology for exchanging messages", required = true, allowableValues = "kafka")
     private String technology;
 
     @NotNull

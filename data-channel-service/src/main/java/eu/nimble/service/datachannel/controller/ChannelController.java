@@ -2,7 +2,6 @@ package eu.nimble.service.datachannel.controller;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import de.fraunhofer.iosb.ilt.sta.ServiceFailureException;
-import de.fraunhofer.iosb.ilt.sta.model.Entity;
 import de.fraunhofer.iosb.ilt.sta.model.Thing;
 import eu.nimble.service.datachannel.entity.ChannelContract;
 import eu.nimble.service.datachannel.entity.CompanyChannels;
@@ -22,6 +21,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
+/**
+ * REST Controller for endpoints for managing data channels.
+ *
+ * @author Johannes Innerbichler
+ */
 @Controller
 @RequestMapping(path = "/channel")
 @Api("Data Channel API")
@@ -33,16 +37,32 @@ public class ChannelController {
     private SensorThingsContracts sensorThingsContracts;
 
     @Autowired
-    private  IdentityClient identityClient;
+    private IdentityClient identityClient;
 
-    @ApiOperation(value = "Create new channel", response = Thing.class, nickname = "createChannel")
+    /**
+     * See API documentation
+     *
+     * @param channelContract Contract, which is used for opening the channel
+     * @param bearer          OpenID Connect token storing requesting identity
+     * @return ResponseEntity with proper channel definition
+     * @throws ServiceFailureException Error while communication with the Identity Service
+     * @throws IOException             Error while communicating with the SensorThings Server
+     * @throws UnirestException        Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Create new channel", notes = "Creates a new channel according to the provide contract. " +
+            "It is checked that the requested user stored on the " +
+            "Open ID Connect token is from the producer company (i.e. only producing companies can open channels). " +
+            "The channel is stored in an SensorThings (see http://www.opengeospatial.org/standards/sensorthings) Thing object " +
+            "(de.fraunhofer.iosb.ilt.sta.model.Thing), whereas the original contract " +
+            "(eu.nimble.service.datachannel.entity.ChannelContract) is stored in the properties field under the key 'contract'.",
+            response = Thing.class, nickname = "createChannel")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channel created", response = Thing.class),
             @ApiResponse(code = 400, message = "Error while creating channel")})
     @RequestMapping(value = "/", produces = {"application/json"}, method = RequestMethod.POST)
     ResponseEntity<?> createChannel(
             @ApiParam(value = "Channel configuration", required = true) @RequestBody ChannelContract channelContract,
-            @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
 
         // check if company id matches
         String companyId = identityClient.getCompanyId(bearer);
@@ -54,7 +74,20 @@ public class ChannelController {
         return new ResponseEntity<>(createdThing, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get channel with id", response = Thing.class, nickname = "getChannel")
+    /**
+     * See API documentation
+     *
+     * @param channelID Identifier of requested channel.
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws ServiceFailureException Error while communication with the Identity Service
+     * @throws IOException             Error while communicating with the SensorThings Server
+     * @throws UnirestException        Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Get channel with id", notes = "The channel is stored in an SensorThings (see http://www.opengeospatial.org/standards/sensorthings) Thing object " +
+            "(de.fraunhofer.iosb.ilt.sta.model.Thing), whereas the original contract " +
+            "(eu.nimble.service.datachannel.entity.ChannelContract) is stored in the properties field under the key 'contract'.",
+            response = Thing.class, nickname = "getChannel")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channel found", response = Thing.class),
             @ApiResponse(code = 404, message = "Channel not found"),
@@ -62,7 +95,7 @@ public class ChannelController {
     @RequestMapping(value = "/{channelID}", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> getChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable Long channelID,
-            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException, ServiceFailureException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException, ServiceFailureException {
 
         // get contract of companies
         String companyId = identityClient.getCompanyId(bearer);
@@ -87,13 +120,24 @@ public class ChannelController {
         return new ResponseEntity<>(thing, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get channels for company", notes = "Company is extracted from AccessToken",
+    /**
+     * See API documentation
+     *
+     * @param bearer OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws ServiceFailureException Error while communication with the Identity Service
+     * @throws IOException             Error while communicating with the SensorThings Server
+     * @throws UnirestException        Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Get channels for company", notes = "Gets all channels (producer and consumer) associated with a company, whereas the " +
+            "company is extracted from the identity stored in the OpenID Connect token.",
             response = CompanyChannels.class, nickname = "getChannelForCompany")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channels found", response = CompanyChannels.class),
             @ApiResponse(code = 400, message = "Error while fetching channels")})
     @RequestMapping(value = "/company", produces = {"application/json"}, method = RequestMethod.GET)
-    ResponseEntity<?> getChannelForCompany(@RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
+    ResponseEntity<?> getChannelsForCompany(
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
 
         // ToDo: check if proper accesstoken (e.g. check role)
 

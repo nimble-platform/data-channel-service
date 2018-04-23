@@ -13,12 +13,23 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * REST Client for communication with the Identity Service.
+ * @author Johannes Innerbichler
+ */
 @Component
 public class IdentityClient {
 
     @Value("${nimble.identity.service-url}")
     private String identityServiceUrl;
 
+    /**
+     * Extract the identity from an OpenID Connect token and fetches the associated company from the Identity Service.
+     * @param accessToken OpenID Connect token storing identity.
+     * @return Identifier of associated company
+     * @throws IOException Token cannot be read
+     * @throws UnirestException Error while communicating with the Identity Service.
+     */
     public String getCompanyId(String accessToken) throws IOException, UnirestException {
         String rawAccessToken = accessToken.replace("Bearer ", "");
 
