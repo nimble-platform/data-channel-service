@@ -1,4 +1,4 @@
-package eu.nimble.service.datachannel.entity;
+package eu.nimble.service.datachannel.entity.requests;
 
 import de.fraunhofer.iosb.ilt.sta.model.Thing;
 

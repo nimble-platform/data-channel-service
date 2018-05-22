@@ -42,7 +42,7 @@ spring:
     name: channeldb
     driverClassName: org.h2.Driver
 #    url: jdbc:h2:file:~/channeldb;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE;DB_CLOSE_DELAY=-1
-    url: jdbc:h2:file:~/channeldb
+    url: jdbc:h2:file:~/channeldb_h2
     initialize: true
     username: sa
     password: sa
