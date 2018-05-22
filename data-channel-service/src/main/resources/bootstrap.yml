@@ -24,9 +24,9 @@ spring:
 #      use-new-id-generator-mappings: true
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:datachannelDB}
-    username: ${POSTGRES_USER:root}
-    password: ${POSTGRES_PASSWORD:changeme}
+    url: jdbc:postgresql://${DATACHANNEL_DB_HOST:localhost}:${DATACHANNEL_DB_HOST_PORT:5432}/${DATACHANNEL_DB_NAME:datachanneldb}
+    username: ${DATACHANNEL_DB_USERNAME:root}
+    password: ${DATACHANNEL_DB_PASSWORD:changeme}
 logstash:
   uri: ${LOGSTASH_URI:localhost:5000}
 
