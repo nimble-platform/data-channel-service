@@ -63,8 +63,8 @@ public class ChannelController {
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws ServiceFailureException, IOException, UnirestException {
 
         // check if company id matches
-        String companyId = identityClient.getCompanyId(bearer);
-        if (createChannelRequest.getProducerCompanyID().equals(companyId) == false)
+        String companyID = identityClient.getCompanyId(bearer);
+        if (createChannelRequest.getProducerCompanyID().equals(companyID) == false)
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         ChannelConfiguration config = new ChannelConfiguration(createChannelRequest.getProducerCompanyID(),
@@ -86,33 +86,54 @@ public class ChannelController {
      * @param channelID Identifier of requested channel.
      * @param bearer    OpenID Connect token storing requesting identity
      * @return See API documentation
-     * @throws ServiceFailureException Error while communication with the Identity Service
-     * @throws IOException             Error while communicating with the SensorThings Server
-     * @throws UnirestException        Error while communication with the Identity Service
+     * @throws UnirestException Error while communication with the Identity Service
      */
-    @ApiOperation(value = "Get channel with id", notes = "The channel is stored in an SensorThings (see http://www.opengeospatial.org/standards/sensorthings) Thing object " +
-            "(de.fraunhofer.iosb.ilt.sta.model.Thing), whereas the original contract " +
-            "(eu.nimble.service.datachannel.entity.ChannelConfiguration) is stored in the properties field under the key 'contract'.",
-            response = ChannelConfiguration.class, nickname = "getChannel")
+    @ApiOperation(value = "Get channel with id", response = ChannelConfiguration.class, nickname = "getChannel")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channel found", response = ChannelConfiguration.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Channel not found"),
             @ApiResponse(code = 400, message = "Error while fetching channel")})
     @RequestMapping(value = "/{channelID}", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> getChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable Long channelID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException, ServiceFailureException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneById(channelID);
         if (channelConfiguration == null)
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyId = identityClient.getCompanyId(bearer);
-        if (channelConfiguration.getProducerCompanyID().equals(companyId) == false && channelConfiguration.getConsumerCompanyIDs().contains(companyId) == false)
+        String companyID = identityClient.getCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get channels associated with business process", response = ChannelConfiguration.class,
+            notes = "Returns empy list of no channel was found", nickname = "getChannelsForBusinessProcess", responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Channel found", response = ChannelConfiguration.class, responseContainer = "List"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Channel not found"),
+            @ApiResponse(code = 400, message = "Error while fetching channel")})
+    @RequestMapping(value = "/business-process/{businessProcessID}", produces = {"application/json"}, method = RequestMethod.GET)
+    ResponseEntity<?> getChannelForBusinessProcess(
+            @ApiParam(value = "businessProcessID", required = true) @PathVariable String businessProcessID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) 
+            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        // query all relevant channels
+        Set<ChannelConfiguration> channels = channelConfigurationRepository.findByBusinessProcessID(businessProcessID);
+
+        // check if requester is authorized
+        String companyID = identityClient.getCompanyId(bearer);
+        if (channels.stream().allMatch(channelConfiguration -> isAuthorized(channelConfiguration, companyID)) == false) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(channels, HttpStatus.OK);
     }
 
 //    /**
@@ -147,4 +168,9 @@ public class ChannelController {
 //
 //        return new ResponseEntity<>(new CompanyChannels(producerThings, consumingThings), HttpStatus.OK);
 //    }
+
+    public static Boolean isAuthorized(ChannelConfiguration channelConfiguration, String companyID) {
+        return channelConfiguration.getProducerCompanyID().equals(companyID)
+                || channelConfiguration.getConsumerCompanyIDs().contains(companyID);
+    }
 }
