@@ -2,7 +2,6 @@ package eu.nimble.service.datachannel.controller;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
-import eu.nimble.service.datachannel.entity.requests.CreateChannel;
 import eu.nimble.service.datachannel.identity.IdentityClient;
 import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
 import io.swagger.annotations.*;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import request.CreateChannel;
 
 import java.io.IOException;
 import java.util.HashMap;
