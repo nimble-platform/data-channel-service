@@ -16,6 +16,17 @@ spring:
       # service discovery is disabled by default and should be enabled (set to true) for the "cloud mode".
       # it can be set via an environment variable or the config server
       enabled: ${discovery.enabled:${DISCOVERY_ENABLED:false}}
+  jpa:
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+#      use-new-id-generator-mappings: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:datachannelDB}
+    username: ${POSTGRES_USER:root}
+    password: ${POSTGRES_PASSWORD:changeme}
 logstash:
   uri: ${LOGSTASH_URI:localhost:5000}
 
