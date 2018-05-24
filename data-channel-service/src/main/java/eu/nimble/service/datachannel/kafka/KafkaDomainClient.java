@@ -27,7 +27,6 @@ public class KafkaDomainClient {
 
     public String createChannel(ChannelConfiguration channelConfig) throws UnirestException {
 
-
         return UUID.randomUUID().toString();
 //        String sourceID = channelConfig.getProducerCompanyID();
 //        String targetID = channelConfig.getConsumerCompanyIDs().stream().findFirst().get();
