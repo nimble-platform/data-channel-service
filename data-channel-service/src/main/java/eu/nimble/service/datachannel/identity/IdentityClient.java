@@ -38,7 +38,7 @@ public class IdentityClient {
         Jwt tokenDecoded = JwtHelper.decode(rawAccessToken);
         Map<String, String> authInfo = new ObjectMapper().readValue(tokenDecoded.getClaims(), Map.class);
 
-        // obtain extened user information
+        // obtain extended user information
         HttpResponse<JsonNode> response = Unirest.get(identityServiceUrl + "/user-info")
                 .header("Authorization", accessToken)
                 .asJson();

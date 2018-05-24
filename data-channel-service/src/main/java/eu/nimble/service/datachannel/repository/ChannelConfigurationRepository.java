@@ -8,7 +8,11 @@ import java.util.Set;
 
 @Repository
 public interface ChannelConfigurationRepository extends CrudRepository<ChannelConfiguration, Long> {
-    ChannelConfiguration findOneById(Long channelID);
+    ChannelConfiguration findOneByChannelID(String channelID);
 
     Set<ChannelConfiguration> findByBusinessProcessID(String businessProcessID);
+
+    Set<ChannelConfiguration> findByProducerCompanyID(String companyId);
+
+    Set<ChannelConfiguration> findByConsumerCompanyIDs(String companyId);
 }

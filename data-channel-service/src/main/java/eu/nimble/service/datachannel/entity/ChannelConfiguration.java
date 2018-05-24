@@ -19,6 +19,9 @@ public class ChannelConfiguration {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @ApiModelProperty(value = "Unique identifier of channel", required = true)
+    private String channelID;
+
     @NotNull
     @ApiModelProperty(value = "ID of producing company", required = true)
     private String producerCompanyID;
@@ -79,6 +82,14 @@ public class ChannelConfiguration {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getChannelID() {
+        return channelID;
+    }
+
+    public void setChannelID(String channelID) {
+        this.channelID = channelID;
     }
 
     public String getProducerCompanyID() {
