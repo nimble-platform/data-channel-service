@@ -33,7 +33,7 @@ services:
             gost_db_host: gost-db
 #            GOST_SERVER_EXTERNAL_URI: http://${HOSTNAME}:8082
 #            GOST_SERVER_MAX_ENTITIES: 200
-    dashboard:
+    gost-dashboard:
         image: geodan/gost-dashboard:0.5
         restart: always
         ports:
