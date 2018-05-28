@@ -39,6 +39,10 @@ nimble:
   kafka-domain:
     service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
 
+logging:
+  level:
+    eu.nimble.service.datachannel: DEBUG
+
 ---
 
 spring:

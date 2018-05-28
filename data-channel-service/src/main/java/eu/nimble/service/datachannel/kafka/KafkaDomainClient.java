@@ -1,18 +1,17 @@
 package eu.nimble.service.datachannel.kafka;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * REST Client for communications with services in the Kafka domain.
@@ -24,6 +23,8 @@ public class KafkaDomainClient {
 
     @Value("${nimble.kafka-domain.service-url}")
     private String kafkaDomainUrl;
+
+    private static Logger logger = LoggerFactory.getLogger(KafkaDomainClient.class);
 
     public String createChannel(ChannelConfiguration channelConfig) throws UnirestException {
 
@@ -41,6 +42,8 @@ public class KafkaDomainClient {
                 .queryString("target", targetID)
                 .queryString("filter", jsonFilter.toString())
                 .asString();
+
+        logger.debug("{} {} {}", response.getStatus(), response.getStatusText(), response.getBody());
 
         return response.getBody();
     }
