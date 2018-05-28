@@ -27,27 +27,26 @@ public class KafkaDomainClient {
 
     public String createChannel(ChannelConfiguration channelConfig) throws UnirestException {
 
-        return UUID.randomUUID().toString();
-//        String sourceID = channelConfig.getProducerCompanyID();
-//        String targetID = channelConfig.getConsumerCompanyIDs().stream().findFirst().get();
-//
-//        // create filter json
-//        Map<String, String> map = new HashMap<>();
-//        map.put("producerCompanyID", channelConfig.getProducerCompanyID());
-//        JSONObject jsonFilter = new JSONObject(map);
-//
-//        // create channel in Kafka domain
-//        HttpResponse<String> response = Unirest.post(kafkaDomainUrl + "/start-new")
-//                .queryString("source", sourceID)
-//                .queryString("target", targetID)
-//                .queryString("filter", jsonFilter.toString())
-//                .asString();
-//
-//        return response.getBody();
+        String sourceID = channelConfig.getProducerCompanyID();
+        String targetID = channelConfig.getConsumerCompanyIDs().stream().findFirst().get();
+
+        // create filter json
+        Map<String, String> map = new HashMap<>();
+        map.put("producerCompanyID", channelConfig.getProducerCompanyID());
+        JSONObject jsonFilter = new JSONObject(map);
+
+        // create channel in Kafka domain
+        HttpResponse<String> response = Unirest.post(kafkaDomainUrl + "/start-new")
+                .queryString("source", sourceID)
+                .queryString("target", targetID)
+                .queryString("filter", jsonFilter.toString())
+                .asString();
+
+        return response.getBody();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void deleteChannel(String channelID){
-//        Unirest.delete(kafkaDomainUrl + "/" + channelID);
+        Unirest.delete(kafkaDomainUrl + "/" + channelID);
     }
 }
