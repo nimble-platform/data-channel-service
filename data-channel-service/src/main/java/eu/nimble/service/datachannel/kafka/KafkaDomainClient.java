@@ -36,11 +36,15 @@ public class KafkaDomainClient {
         map.put("producerCompanyID", channelConfig.getProducerCompanyID());
         JSONObject jsonFilter = new JSONObject(map);
 
+        JSONObject body = new JSONObject();
+        body.accumulate("source", sourceID);
+        body.accumulate("target", targetID);
+        body.accumulate("filter", jsonFilter);
+
         // create channel in Kafka domain
         HttpResponse<String> response = Unirest.post(kafkaDomainUrl + "/start-new")
-                .queryString("source", sourceID)
-                .queryString("target", targetID)
-                .queryString("filter", jsonFilter.toString())
+                .header("Content-Type", "application/json")
+                .body(body)
                 .asString();
 
         logger.debug("{} {} {}", response.getStatus(), response.getStatusText(), response.getBody());
