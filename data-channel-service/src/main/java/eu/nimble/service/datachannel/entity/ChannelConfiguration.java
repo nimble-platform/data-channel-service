@@ -64,16 +64,13 @@ public class ChannelConfiguration {
     }
 
     public ChannelConfiguration(String producerCompanyID, Set<String> consumerCompanyIDs, String description,
-                                Date startDateTime, Date endDateTime, String businessProcessID, String producerTopic,
-                                Map<String, String> consumerTopics) {
+                                Date startDateTime, Date endDateTime, String businessProcessID) {
         this.producerCompanyID = producerCompanyID;
         this.consumerCompanyIDs = consumerCompanyIDs;
         this.description = description;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.businessProcessID = businessProcessID;
-        this.producerTopic = producerTopic;
-        this.consumerTopics = consumerTopics;
     }
 
     public Long getId() {

@@ -17,6 +17,7 @@ import request.CreateChannel;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,14 +77,17 @@ public class ChannelController {
                 createChannelRequest.getDescription(),
                 createChannelRequest.getStartDateTime(),
                 createChannelRequest.getEndDateTime(),
-                createChannelRequest.getBusinessProcessID(),
-                "dummyProducerTopic",  // Todo: determine input topic
-                new HashMap<>());  // Todo: determine output topics
+                createChannelRequest.getBusinessProcessID());
 
         // set up channel in the Kafka domain
-        String channelID = kafkaDomainClient.createChannel(config);
-        config.setChannelID(channelID);
+        KafkaDomainClient.CreateChannelResponse response = kafkaDomainClient.createChannel(config);
 
+        // update and save channel configuration
+        config.setChannelID(response.getChannelId());
+        config.setProducerTopic(response.getInputTopic());
+        Map<String, String> consumerTopics = new HashMap<>();
+        consumerTopics.put(config.getConsumerCompanyIDs().stream().findFirst().get(), response.getOutputTopic());
+        config.setConsumerTopics(consumerTopics);
         config = channelConfigurationRepository.save(config);
 
         logger.info("Company {} opened channel with ID {}", companyID, config.getChannelID());

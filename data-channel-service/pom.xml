@@ -198,6 +198,12 @@
             <artifactId>data-channel</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-json-org</artifactId>
+            <version>2.9.0</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>app</finalName>
