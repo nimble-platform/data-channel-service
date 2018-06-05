@@ -13,8 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * REST Client for communications with services in the Kafka domain.
@@ -59,6 +62,16 @@ public class KafkaDomainClient {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void deleteChannel(String channelID) {
         Unirest.delete(kafkaDomainUrl + "/" + channelID);
+    }
+
+    public List<Object> getMessages(String channelID) throws UnirestException {
+        HttpResponse<JsonNode> response = Unirest.get(kafkaDomainUrl + "/" + channelID + "/messages").asJson();
+
+        List<Object> messages = new ArrayList<>(response.getBody().getObject().getJSONArray("messages").toList());
+
+
+
+        return messages;
     }
 
     @SuppressWarnings("unused")

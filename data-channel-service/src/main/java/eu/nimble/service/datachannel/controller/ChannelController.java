@@ -17,6 +17,7 @@ import request.CreateChannel;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -197,31 +198,33 @@ public class ChannelController {
         return new ResponseEntity<>(allChannels, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get channels associated with business process", response = ChannelConfiguration.class,
-            notes = "Returns empty list if no channel was found", nickname = "getChannelsForBusinessProcess", responseContainer = "List")
+    @ApiOperation(value = "Get messages of channel.", response = Object.class,
+            notes = "Returns list of exchanges messages", nickname = "getMessagesForChannel", responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Channel found", response = ChannelConfiguration.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "Channel found", response = Object.class, responseContainer = "List"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Channel not found"),
             @ApiResponse(code = 400, message = "Error while fetching channel")})
-    @RequestMapping(value = "/business-process/{businessProcessID}", produces = {"application/json"}, method = RequestMethod.GET)
-    ResponseEntity<?> getChannelForBusinessProcess(
-            @ApiParam(value = "businessProcessID", required = true) @PathVariable String businessProcessID,
+    @RequestMapping(value = "/{channelID}/messages", produces = {"application/json"}, method = RequestMethod.GET)
+    ResponseEntity<?> getMessagesForChannel(
+            @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
-        // query all relevant channels
-        Set<ChannelConfiguration> channels = channelConfigurationRepository.findByBusinessProcessID(businessProcessID);
+//        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+//        if (channelConfiguration == null)
+//            return ResponseEntity.notFound().build();
+//
+//        // check if request is authorized
+//        String companyID = identityClient.getCompanyId(bearer);
+//        if (isAuthorized(channelConfiguration, companyID) == false)
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        // check if requester is authorized
-        String companyID = identityClient.getCompanyId(bearer);
-        if (channels.stream().allMatch(channelConfiguration -> isAuthorized(channelConfiguration, companyID)) == false) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+//        logger.info("Company {} requested messages of channel {}", companyID, channelID);
 
-        logger.info("Company {} requested channel for business process with ID {}", companyID, businessProcessID);
+        List<Object> messages = kafkaDomainClient.getMessages(channelID);
 
-        return new ResponseEntity<>(channels, HttpStatus.OK);
+        return new ResponseEntity<>(messages, HttpStatus.OK);
     }
 
     private static Boolean isAuthorized(ChannelConfiguration channelConfiguration, String companyID) {
