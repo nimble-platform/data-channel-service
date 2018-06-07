@@ -16,6 +16,19 @@ spring:
       # service discovery is disabled by default and should be enabled (set to true) for the "cloud mode".
       # it can be set via an environment variable or the config server
       enabled: ${discovery.enabled:${DISCOVERY_ENABLED:false}}
+  jpa:
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+#      use-new-id-generator-mappings: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${DATACHANNEL_DB_HOST:localhost}:${DATACHANNEL_DB_HOST_PORT:5432}/${DATACHANNEL_DB_NAME:datachanneldb}
+    username: ${DATACHANNEL_DB_USERNAME:root}
+    password: ${DATACHANNEL_DB_PASSWORD:changeme}
+    maxActive: 5
+    maxIdle: 5
 logstash:
   uri: ${LOGSTASH_URI:localhost:5000}
 
@@ -23,6 +36,14 @@ nimble:
   data-channel:
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
+  identity:
+    service-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
+  kafka-domain:
+    service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
+
+logging:
+  level:
+    eu.nimble.service.datachannel: DEBUG
 
 ---
 
@@ -40,7 +61,7 @@ spring:
     name: channeldb
     driverClassName: org.h2.Driver
 #    url: jdbc:h2:file:~/channeldb;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE;DB_CLOSE_DELAY=-1
-    url: jdbc:h2:file:~/channeldb
+    url: jdbc:h2:file:~/channeldb_h2
     initialize: true
     username: sa
     password: sa
