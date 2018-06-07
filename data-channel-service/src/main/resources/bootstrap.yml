@@ -33,6 +33,7 @@ logstash:
   uri: ${LOGSTASH_URI:localhost:5000}
 
 nimble:
+  corsEnabled: false
   data-channel:
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
