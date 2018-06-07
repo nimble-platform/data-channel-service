@@ -86,9 +86,11 @@ public class ChannelController {
         // update and save channel configuration
         config.setChannelID(response.getChannelId());
         config.setProducerTopic(response.getInputTopic());
-        Map<String, String> consumerTopics = new HashMap<>();
-        consumerTopics.put(config.getConsumerCompanyIDs().stream().findFirst().get(), response.getOutputTopic());
-        config.setConsumerTopics(consumerTopics);
+        if (config.getConsumerCompanyIDs().stream().findFirst().isPresent() ) {
+            Map<String, String> consumerTopics = new HashMap<>();
+            consumerTopics.put(config.getConsumerCompanyIDs().stream().findFirst().get(), response.getOutputTopic());
+            config.setConsumerTopics(consumerTopics);
+        }
         config = channelConfigurationRepository.save(config);
 
         logger.info("Company {} opened channel with ID {}", companyID, config.getChannelID());
@@ -175,7 +177,7 @@ public class ChannelController {
      * @return See API documentation
      * @throws UnirestException Error while communication with the Identity Service
      */
-    @ApiOperation(value = "Get all associated channels", nickname = "getAllChannels",
+    @ApiOperation(value = "Get all associated channels with a company", nickname = "getAllChannels",
             response = ChannelConfiguration.class, responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channels found", responseContainer = "List"),
@@ -198,6 +200,36 @@ public class ChannelController {
         return new ResponseEntity<>(allChannels, HttpStatus.OK);
     }
 
+    /**
+     * See API documentation
+     *
+     * @param bearer OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Get all associated channels for a business process", nickname = "getChannelsForBusinessProcessService",
+            response = ChannelConfiguration.class, responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Channels found", responseContainer = "List"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 400, message = "Error while fetching channels")})
+    @RequestMapping(value = "/business-process/{businessProcessID}", produces = {"application/json"}, method = RequestMethod.GET)
+    ResponseEntity<?> getChannelsForBusinessProcessService(
+            @ApiParam(value = "businessProcessID", required = true) @PathVariable String businessProcessID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        // extract ID of company
+        String companyID = identityClient.getCompanyId(bearer);
+
+//        businessProcessID = "444"; // ToDo: remove
+
+        Set<ChannelConfiguration> channels = this.channelConfigurationRepository.findByBusinessProcessID(businessProcessID);
+
+        logger.info("Company {} requested associated channels for business process with ID {}", companyID, businessProcessID);
+
+        return new ResponseEntity<>(channels, HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Get messages of channel.", response = Object.class,
             notes = "Returns list of exchanges messages", nickname = "getMessagesForChannel", responseContainer = "List")
     @ApiResponses(value = {
@@ -211,16 +243,18 @@ public class ChannelController {
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
-//        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
-//        if (channelConfiguration == null)
-//            return ResponseEntity.notFound().build();
-//
-//        // check if request is authorized
-//        String companyID = identityClient.getCompanyId(bearer);
-//        if (isAuthorized(channelConfiguration, companyID) == false)
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null)
+            return ResponseEntity.notFound().build();
 
-//        logger.info("Company {} requested messages of channel {}", companyID, channelID);
+        // check if request is authorized
+        String companyID = identityClient.getCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        logger.info("Company {} requested messages of channel {}", companyID, channelID);
+
+//        channelID = "8d2599f4-e990-48dd-bcff-bc11e338196c"; // ToDo: remove
 
         List<Object> messages = kafkaDomainClient.getMessages(channelID);
 

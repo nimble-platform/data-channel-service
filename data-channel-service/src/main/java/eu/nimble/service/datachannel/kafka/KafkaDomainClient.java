@@ -69,8 +69,6 @@ public class KafkaDomainClient {
 
         List<Object> messages = new ArrayList<>(response.getBody().getObject().getJSONArray("messages").toList());
 
-
-
         return messages;
     }
 
