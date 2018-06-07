@@ -34,15 +34,15 @@ node('nimble-jenkins-slave') {
             sh 'ssh staging "cd /srv/nimble-staging/ && ./run-staging.sh restart-single data-channel-service"'
         }
     } else {
-//        stage('Build Docker') {
-//            sh 'mvn -f identity-service/pom.xml docker:build'
-//        }
+        stage('Build Docker') {
+            sh 'mvn -f identity-service/pom.xml docker:build'
+        }
     }
 
     if (env.BRANCH_NAME == 'master') {
-//        stage('Deploy') {
-//            sh 'ssh nimble "cd /data/deployment_setup/prod/ && sudo ./run-prod.sh restart-single identity-service"'
-//        }
+        stage('Deploy') {
+            sh 'ssh nimble "cd /data/deployment_setup/prod/ && sudo ./run-prod.sh restart-single identity-service"'
+        }
     }
 
 //    if (env.BRANCH_NAME == 'master') {
