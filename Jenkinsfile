@@ -35,13 +35,13 @@ node('nimble-jenkins-slave') {
         }
     } else {
         stage('Build Docker') {
-            sh 'mvn -f identity-service/pom.xml docker:build'
+            sh 'mvn -f data-channel-service/pom.xml docker:build'
         }
     }
 
     if (env.BRANCH_NAME == 'master') {
         stage('Deploy') {
-            sh 'ssh nimble "cd /data/deployment_setup/prod/ && sudo ./run-prod.sh restart-single identity-service"'
+            sh 'ssh nimble "cd /data/deployment_setup/prod/ && sudo ./run-prod.sh restart-single data-channel-service"'
         }
     }
 
