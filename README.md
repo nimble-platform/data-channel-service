@@ -1,4 +1,4 @@
-# Data Channel Serive
+# Data Channel Service
 **ServiceID**: data-channel-service
 
 Service for managing data channel contracts.
