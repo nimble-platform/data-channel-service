@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "Closing date/time of data channel", required = true)
     private java.util.Date endDateTime;
 
-    @ApiModelProperty(value = "ID of originating business process (optional)", required = false)
+    @ApiModelProperty(value = "ID of originating business process (optional)")
     private String businessProcessID;
 
     @NotNull
@@ -59,6 +60,11 @@ public class ChannelConfiguration {
     @CollectionTable(name = "consumer_topics", joinColumns = @JoinColumn(name = "company_id"))
     @ApiModelProperty(value = "Map for mapping producer company IDs to associated Kafka topics.")
     private Map<String, String> consumerTopics;
+
+    @NotNull
+    @ElementCollection(targetClass = Sensor.class)
+    @ApiModelProperty(value = "Associated sensors")
+    private Set<Sensor> associatedSensors;
 
     public ChannelConfiguration() {
     }
@@ -151,5 +157,13 @@ public class ChannelConfiguration {
 
     public void setConsumerTopics(Map<String, String> consumerTopics) {
         this.consumerTopics = consumerTopics;
+    }
+
+    public Set<Sensor> getAssociatedSensors() {
+        return associatedSensors;
+    }
+
+    public void setAssociatedSensors(Set<Sensor> associatedSensors) {
+        this.associatedSensors = associatedSensors;
     }
 }
