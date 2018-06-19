@@ -10,6 +10,8 @@ import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
 import eu.nimble.service.datachannel.repository.MachineRepository;
 import eu.nimble.service.datachannel.repository.SensorRepository;
 import io.swagger.annotations.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import request.CreateChannel;
+import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
 import java.util.*;
@@ -325,21 +328,24 @@ public class ChannelController {
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
+        // check if machine already exists
+        Machine machineToStore = machineRepository.findOneByName(sensor.getMachine().getName());
+        if (machineToStore == null ) {
+            sensor.getMachine().setOwnerID(companyID);
+            machineToStore = machineRepository.save(sensor.getMachine());
+        }
+
         // check if sensor already exists
         Sensor existingSensor = sensorRepository.findOneByName(sensor.getName());
         if ( existingSensor != null) {
+            if (StringUtils.isBlank(sensor.getDescription()) == false)
+                existingSensor.setDescription(sensor.getDescription());
+            existingSensor.setMachine(machineToStore);
             sensor = existingSensor;
         }
 
-        // check if machine already exists
-        Machine existingMachine = machineRepository.findOneByName(sensor.getMachine().getName());
-        if (existingMachine == null ) {
-            sensor.getMachine().setOwnerID(companyID);
-            existingMachine = machineRepository.save(sensor.getMachine());
-        }
-
         // store sensor
-        sensor.setMachine(existingMachine);
+        sensor.setMachine(machineToStore);
         sensorRepository.save(sensor);
 
         // add sensor to channel

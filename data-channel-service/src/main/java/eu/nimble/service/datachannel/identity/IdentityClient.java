@@ -8,7 +8,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
  * REST Client for communication with the Identity Service.
  * @author Johannes Innerbichler
  */
-@Component
+@Service
 public class IdentityClient {
 
     @Value("${nimble.identity.service-url}")

@@ -6,10 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @ApiModel(value = "ChannelConfiguration")
@@ -64,7 +61,7 @@ public class ChannelConfiguration {
     @NotNull
     @ElementCollection(targetClass = Sensor.class)
     @ApiModelProperty(value = "Associated sensors")
-    private Set<Sensor> associatedSensors;
+    private Set<Sensor> associatedSensors = new HashSet<>();
 
     public ChannelConfiguration() {
     }
