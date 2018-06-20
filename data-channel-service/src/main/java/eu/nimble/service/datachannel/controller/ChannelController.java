@@ -267,6 +267,8 @@ public class ChannelController {
 
         List<Object> messages = kafkaDomainClient.getMessages(channelID);
 
+        logger.info("Returning {} messages for channel {}", messages.size(), channelID);
+
         return new ResponseEntity<>(messages, HttpStatus.OK);
     }
 
