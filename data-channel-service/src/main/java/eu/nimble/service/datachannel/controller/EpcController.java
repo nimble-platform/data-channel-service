@@ -62,7 +62,7 @@ public class EpcController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "EPC codes found"),
             @ApiResponse(code = 400, message = "Error while querying the codes")})
-    @RequestMapping(value = "/{orderId}", consumes = {"application/json"}, method = RequestMethod.GET)
+    @RequestMapping(value = "/{orderId}", method = RequestMethod.GET)
     ResponseEntity<?> getEPCCodes(
                     @ApiParam(value = "orderId", required = true) @PathVariable String orderId,
                     @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {

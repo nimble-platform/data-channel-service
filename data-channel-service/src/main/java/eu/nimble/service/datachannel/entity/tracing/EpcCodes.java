@@ -28,6 +28,14 @@ public class EpcCodes {
     @ApiModelProperty(value = "EPC codes of order", required = true)
     private Set<String> codes = new HashSet<>();
 
+    private EpcCodes() {
+    }
+
+    public EpcCodes(String orderId, Set<String> codes) {
+        this.orderId = orderId;
+        this.codes = codes;
+    }
+
     public Long getId() {
         return id;
     }
