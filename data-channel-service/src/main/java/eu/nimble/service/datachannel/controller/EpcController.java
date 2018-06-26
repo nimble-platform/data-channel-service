@@ -103,6 +103,27 @@ public class EpcController {
         return ResponseEntity.ok(epcCodes);
     }
 
+    @ApiOperation(value = "Get EPC objects for a specific code.", nickname = "getEpcCodesByCode", responseContainer = "Set", response = EpcCodes.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "EPC codes found"),
+            @ApiResponse(code = 400, message = "Error while querying the codes")})
+    @RequestMapping(value = "/code/{code}", method = RequestMethod.GET)
+    ResponseEntity<?> getMultipleEpcCodesByCode(
+            @ApiParam(value = "code", required = true) @PathVariable String code,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer) throws UnirestException {
+
+        // check if company id matches
+        // ToDo: verify access token and company
+        identityClient.getCompanyId(bearer);
+
+        Set<EpcCodes> epcCodes = epcCodesRepository.findByCodes(code);
+
+        logger.info("Returning EPC codes for code {}", code);
+
+        return ResponseEntity.ok(epcCodes);
+    }
+
     @ApiOperation(value = "Delete EPC codes for an order and returns updated object.", nickname = "deleteEpcCodes", response = EpcCodes.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "EPC codes deleted"),
