@@ -157,7 +157,8 @@ public class ChannelController {
     @RequestMapping(value = "/{channelID}", method = RequestMethod.DELETE)
     ResponseEntity<?> closeChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
         if (channelConfiguration == null)
@@ -194,7 +195,8 @@ public class ChannelController {
             @ApiResponse(code = 400, message = "Error while fetching channels")})
     @RequestMapping(value = "/all", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> associatedChannels(
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         // extract ID of company
         String companyID = identityClient.getCompanyId(bearer);
@@ -225,7 +227,8 @@ public class ChannelController {
     @RequestMapping(value = "/business-process/{businessProcessID}", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> getChannelsForBusinessProcessService(
             @ApiParam(value = "businessProcessID", required = true) @PathVariable String businessProcessID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         // extract ID of company
         String companyID = identityClient.getCompanyId(bearer);
@@ -250,7 +253,7 @@ public class ChannelController {
     ResponseEntity<?> getMessagesForChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
         if (channelConfiguration == null)
