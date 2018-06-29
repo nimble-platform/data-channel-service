@@ -107,7 +107,7 @@ public class EpcController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "EPC codes found"),
             @ApiResponse(code = 400, message = "Error while querying the codes")})
-    @RequestMapping(value = "/code/{code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/code/{code:.+}", method = RequestMethod.GET)
     ResponseEntity<?> getMultipleEpcCodesByCode(
             @ApiParam(value = "code", required = true) @PathVariable String code,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
