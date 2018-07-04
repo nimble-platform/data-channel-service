@@ -14,7 +14,6 @@ public class Sensor {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
     @NotNull
     @ApiModelProperty(value = "Name of sensor")
     private String name;

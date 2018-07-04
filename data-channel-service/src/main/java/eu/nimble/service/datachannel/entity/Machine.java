@@ -16,7 +16,6 @@ public class Machine {
     private Long id;
 
     @NotNull
-    @Column(unique=true)
     @ApiModelProperty(value = "Name of machine")
     private String name;
 
