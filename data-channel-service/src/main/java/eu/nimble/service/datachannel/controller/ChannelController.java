@@ -332,20 +332,7 @@ public class ChannelController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         // check if machine already exists
-        Machine machineToStore = machineRepository.findOneByName(sensor.getMachine().getName());
-        if (machineToStore == null ) {
-            sensor.getMachine().setOwnerID(companyID);
-            machineToStore = machineRepository.save(sensor.getMachine());
-        }
-
-        // check if sensor already exists
-        Sensor existingSensor = sensorRepository.findOneByName(sensor.getName());
-        if ( existingSensor != null) {
-            if (StringUtils.isBlank(sensor.getDescription()) == false)
-                existingSensor.setDescription(sensor.getDescription());
-            existingSensor.setMachine(machineToStore);
-            sensor = existingSensor;
-        }
+        Machine machineToStore = machineRepository.save(sensor.getMachine());
 
         // store sensor
         sensor.setMachine(machineToStore);
