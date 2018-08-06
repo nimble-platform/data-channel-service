@@ -1,16 +1,15 @@
 package eu.nimble.service.datachannel.controller;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.nimble.common.rest.identity.IdentityResolver;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
 import eu.nimble.service.datachannel.entity.Machine;
 import eu.nimble.service.datachannel.entity.Sensor;
-import eu.nimble.service.datachannel.identity.IdentityClient;
 import eu.nimble.service.datachannel.kafka.KafkaDomainClient;
 import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
 import eu.nimble.service.datachannel.repository.MachineRepository;
 import eu.nimble.service.datachannel.repository.SensorRepository;
 import io.swagger.annotations.*;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ public class ChannelController {
     private static Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
     @Autowired
-    private IdentityClient identityClient;
+    private IdentityResolver identityResolver;
 
     @Autowired
     private KafkaDomainClient kafkaDomainClient;
@@ -77,7 +76,7 @@ public class ChannelController {
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         // check if company id matches
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (createChannelRequest.getProducerCompanyID().equals(companyID) == false)
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
@@ -131,7 +130,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -165,7 +164,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -196,10 +195,10 @@ public class ChannelController {
     @RequestMapping(value = "/all", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> associatedChannels(
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+                @RequestHeader(value = "Authorization") String bearer) throws UnirestException {
 
         // extract ID of company
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
 
         // get associated channels
         Set<ChannelConfiguration> producingChannels = channelConfigurationRepository.findByProducerCompanyID(companyID);
@@ -231,7 +230,7 @@ public class ChannelController {
                 @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         // extract ID of company
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
 
 //        businessProcessID = "444"; // ToDo: remove
 
@@ -260,7 +259,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -293,7 +292,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -327,7 +326,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -367,7 +366,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 

@@ -1,8 +1,8 @@
 package eu.nimble.service.datachannel.controller;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.nimble.common.rest.identity.IdentityResolver;
 import eu.nimble.service.datachannel.entity.tracing.EpcCodes;
-import eu.nimble.service.datachannel.identity.IdentityClient;
 import eu.nimble.service.datachannel.repository.EpcCodesRepository;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class EpcController {
     private EpcCodesRepository epcCodesRepository;
 
     @Autowired
-    private IdentityClient identityClient;
+    private IdentityResolver identityResolver;
 
     @ApiOperation(value = "Register EPC codes for an order.", nickname = "registerEpcCodes")
     @ApiResponses(value = {
@@ -44,7 +44,7 @@ public class EpcController {
 
         // check if company id matches
         // ToDo: verify access token and company
-        identityClient.getCompanyId(bearer);
+        identityResolver.resolveCompanyId(bearer);
 
         // query existing or create new entity
         if (epcCodesRepository.findOneByOrderId(epcCodes.getOrderId()) != null) {
@@ -71,7 +71,7 @@ public class EpcController {
 
         // check if company id matches
         // ToDo: verify access token and company
-        identityClient.getCompanyId(bearer);
+        identityResolver.resolveCompanyId(bearer);
 
         EpcCodes epcCodes = epcCodesRepository.findOneByOrderId(orderId);
         if (epcCodes == null)
@@ -94,7 +94,7 @@ public class EpcController {
 
         // check if company id matches
         // ToDo: verify access token and company
-        identityClient.getCompanyId(bearer);
+        identityResolver.resolveCompanyId(bearer);
 
         List<EpcCodes> epcCodes = epcCodesRepository.findByOrderIdIn(orderIds);
 
@@ -115,7 +115,7 @@ public class EpcController {
 
         // check if company id matches
         // ToDo: verify access token and company
-        identityClient.getCompanyId(bearer);
+        identityResolver.resolveCompanyId(bearer);
 
         Set<EpcCodes> epcCodes = epcCodesRepository.findByCodes(code);
 
@@ -135,7 +135,7 @@ public class EpcController {
 
         // check if company id matches
         // ToDo: verify access token and company
-        identityClient.getCompanyId(bearer);
+        identityResolver.resolveCompanyId(bearer);
 
         // fetch existing codes
         Set<String> toBeDeleted = epcCodes.getCodes();

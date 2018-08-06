@@ -40,7 +40,7 @@ nimble:
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
   identity:
-    service-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
+    identity-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
   kafka-domain:
     service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
 
