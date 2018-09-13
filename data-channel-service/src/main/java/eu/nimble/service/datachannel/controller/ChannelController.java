@@ -1,10 +1,14 @@
 package eu.nimble.service.datachannel.controller;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.nimble.common.rest.identity.IdentityResolver;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
-import eu.nimble.service.datachannel.identity.IdentityClient;
+import eu.nimble.service.datachannel.entity.Machine;
+import eu.nimble.service.datachannel.entity.Sensor;
 import eu.nimble.service.datachannel.kafka.KafkaDomainClient;
 import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
+import eu.nimble.service.datachannel.repository.MachineRepository;
+import eu.nimble.service.datachannel.repository.SensorRepository;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import request.CreateChannel;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,13 +39,20 @@ public class ChannelController {
     private static Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
     @Autowired
-    private IdentityClient identityClient;
+    private IdentityResolver identityResolver;
 
     @Autowired
     private KafkaDomainClient kafkaDomainClient;
 
     @Autowired
     private ChannelConfigurationRepository channelConfigurationRepository;
+
+    @Autowired
+    private SensorRepository sensorRepository;
+
+    @Autowired
+    private MachineRepository machineRepository;
+
 
     /**
      * See API documentation
@@ -68,7 +76,7 @@ public class ChannelController {
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         // check if company id matches
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (createChannelRequest.getProducerCompanyID().equals(companyID) == false)
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
@@ -122,7 +130,7 @@ public class ChannelController {
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -148,14 +156,15 @@ public class ChannelController {
     @RequestMapping(value = "/{channelID}", method = RequestMethod.DELETE)
     ResponseEntity<?> closeChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
         if (channelConfiguration == null)
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -185,10 +194,11 @@ public class ChannelController {
             @ApiResponse(code = 400, message = "Error while fetching channels")})
     @RequestMapping(value = "/all", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> associatedChannels(
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+                @RequestHeader(value = "Authorization") String bearer) throws UnirestException {
 
         // extract ID of company
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
 
         // get associated channels
         Set<ChannelConfiguration> producingChannels = channelConfigurationRepository.findByProducerCompanyID(companyID);
@@ -216,10 +226,11 @@ public class ChannelController {
     @RequestMapping(value = "/business-process/{businessProcessID}", produces = {"application/json"}, method = RequestMethod.GET)
     ResponseEntity<?> getChannelsForBusinessProcessService(
             @ApiParam(value = "businessProcessID", required = true) @PathVariable String businessProcessID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true) @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         // extract ID of company
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
 
 //        businessProcessID = "444"; // ToDo: remove
 
@@ -241,14 +252,14 @@ public class ChannelController {
     ResponseEntity<?> getMessagesForChannel(
             @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+                @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
         ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
         if (channelConfiguration == null)
             return ResponseEntity.notFound().build();
 
         // check if request is authorized
-        String companyID = identityClient.getCompanyId(bearer);
+        String companyID = identityResolver.resolveCompanyId(bearer);
         if (isAuthorized(channelConfiguration, companyID) == false)
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -258,7 +269,115 @@ public class ChannelController {
 
         List<Object> messages = kafkaDomainClient.getMessages(channelID);
 
+        logger.info("Returning {} messages for channel {}", messages.size(), channelID);
+
         return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get sensors of channel.", response = Sensor.class,
+            notes = "Returns list of sensors sorted by ID", nickname = "getSensorsForChannel", responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Channel found", response = Sensor.class, responseContainer = "List"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Channel not found"),
+            @ApiResponse(code = 400, message = "Error while fetching channel")})
+    @RequestMapping(value = "/{channelID}/sensors", produces = {"application/json"}, method = RequestMethod.GET)
+    ResponseEntity<?> getSensorsForChannel(
+            @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null)
+            return ResponseEntity.notFound().build();
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        logger.info("Company {} requested messages of channel {}", companyID, channelID);
+
+        List<Sensor> sortedSensors = channelConfiguration.getAssociatedSensors().stream()
+                .sorted(Comparator.comparing(Sensor::getId))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(sortedSensors, HttpStatus.OK);
+    }
+
+
+    @ApiOperation(value = "Add sensor to channel.", response = Sensor.class,
+            notes = "Add a sensor to a channel", nickname = "getSensorsForChannel")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Sensor added", response = Sensor.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Channel not found"),
+            @ApiResponse(code = 409, message = "Sensor already exists"),
+            @ApiResponse(code = 400, message = "Error while fetching channel")})
+    @RequestMapping(value = "/{channelID}/sensors", produces = {"application/json"}, method = RequestMethod.POST)
+    ResponseEntity<?> addSensorsForChannel(
+            @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
+            @ApiParam(value = "Sensor to be added", required = true) @RequestBody Sensor sensor,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null)
+            return ResponseEntity.notFound().build();
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        // check if machine already exists
+        Machine machineToStore = machineRepository.save(sensor.getMachine());
+
+        // store sensor
+        sensor.setMachine(machineToStore);
+        sensorRepository.save(sensor);
+
+        // add sensor to channel
+        Set<Sensor> configuredSensors = channelConfiguration.getAssociatedSensors();
+        configuredSensors.add(sensor);
+        channelConfigurationRepository.save(channelConfiguration);
+
+        logger.info("Company {} added sensor {}", companyID, sensor.getName());
+
+        return new ResponseEntity<>(sensor, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Remove sensor from channel.",
+            notes = "Remove a sensor to a channel", nickname = "removeSensorsForChannel")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Sensor remove"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Sensor or channel not found"),
+            @ApiResponse(code = 400, message = "Error while fetching channel")})
+    @RequestMapping(value = "/{channelID}/sensors/{sensorID}", method = RequestMethod.DELETE)
+    ResponseEntity<?> removeSensorForChannel(
+            @ApiParam(value = "ID of channel", required = true) @PathVariable String channelID,
+            @ApiParam(value = "SensorID to be removed", required = true) @PathVariable Long sensorID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null)
+            return ResponseEntity.notFound().build();
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        // remove sensor from channel
+        Set<Sensor> associatedSensors = channelConfiguration.getAssociatedSensors().stream()
+                .filter( s -> !s.getId().equals(sensorID))
+                .collect(Collectors.toSet());
+        channelConfiguration.setAssociatedSensors(associatedSensors);
+        channelConfigurationRepository.save(channelConfiguration);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private static Boolean isAuthorized(ChannelConfiguration channelConfiguration, String companyID) {

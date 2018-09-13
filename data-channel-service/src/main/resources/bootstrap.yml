@@ -29,8 +29,8 @@ spring:
     url: jdbc:postgresql://${DATACHANNEL_DB_HOST:localhost}:${DATACHANNEL_DB_HOST_PORT:5432}/${DATACHANNEL_DB_NAME:datachanneldb}
     username: ${DATACHANNEL_DB_USERNAME:root}
     password: ${DATACHANNEL_DB_PASSWORD:changeme}
-    maxActive: 5
-    maxIdle: 5
+    maxActive: 2
+    maxIdle: 2
 logstash:
   uri: ${LOGSTASH_URI:localhost:5000}
 
@@ -40,7 +40,7 @@ nimble:
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
   identity:
-    service-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
+    identity-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
   kafka-domain:
     service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
 
@@ -63,7 +63,6 @@ spring:
   datasource:
     name: channeldb
     driverClassName: org.h2.Driver
-#    url: jdbc:h2:file:~/channeldb;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE;DB_CLOSE_DELAY=-1
     url: jdbc:h2:file:~/channeldb_h2
     initialize: true
     username: sa
@@ -71,3 +70,22 @@ spring:
 
 nimble:
   corsEnabled: true
+
+---
+
+spring:
+  profiles: test
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: false
+  datasource:
+    name: channeldb
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:channeldb
+    initialize: false
+    username: sa
+    password:

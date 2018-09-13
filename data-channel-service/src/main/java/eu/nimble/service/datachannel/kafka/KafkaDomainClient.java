@@ -6,25 +6,25 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.body.RequestBodyEntity;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * REST Client for communications with services in the Kafka domain.
  *
  * @author Johannes Innerbichler
  */
-@Component
+@Service
 public class KafkaDomainClient {
 
     @Value("${nimble.kafka-domain.service-url}")
@@ -48,15 +48,16 @@ public class KafkaDomainClient {
         body.accumulate("filter", jsonFilter);
 
         // create channel in Kafka domain
-        HttpResponse<JsonNode> response = Unirest.post(kafkaDomainUrl + "/start-new")
+        HttpResponse<String> response = Unirest.post(kafkaDomainUrl + "/start-new")
                 .header("Content-Type", "application/json")
                 .body(body)
-                .asJson();
+                .asString();
 
         logger.debug("{} {} {}", response.getStatus(), response.getStatusText(), response.getBody());
 
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JsonOrgModule());
-        return mapper.convertValue(response.getBody().getObject(), CreateChannelResponse.class);
+        JSONObject jsonResponse = new JSONObject(response.getBody());
+        return new CreateChannelResponse(jsonResponse.getString("channelId"), jsonResponse.getString("inputTopic"),
+                jsonResponse.getString("outputTopic"));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -78,6 +79,12 @@ public class KafkaDomainClient {
         private String channelId;
         private String inputTopic;
         private String outputTopic;
+
+        public CreateChannelResponse(String channelId, String inputTopic, String outputTopic) {
+            this.channelId = channelId;
+            this.inputTopic = inputTopic;
+            this.outputTopic = outputTopic;
+        }
 
         public String getChannelId() {
             return channelId;
