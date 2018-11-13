@@ -37,6 +37,7 @@
         <groupId>eu.nimble.services</groupId>
         <artifactId>data-channel-service-parent</artifactId>
         <version>${global.version}</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <developers>
