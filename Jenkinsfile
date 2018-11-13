@@ -40,6 +40,12 @@ node('nimble-jenkins-slave') {
     }
 
     if (env.BRANCH_NAME == 'master') {
+
+        stage('Push Docker') {
+            sh 'mvn -f data-channel-service/pom.xml docker:push'
+            sh 'mvn -f data-channel-service/pom.xml docker:push -DdockerImageTag=latest'
+        }
+
         stage('Deploy') {
             sh 'ssh nimble "cd /data/deployment_setup/prod/ && sudo ./run-prod.sh restart-single data-channel-service"'
         }

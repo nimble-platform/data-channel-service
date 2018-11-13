@@ -18,7 +18,7 @@
 
     <properties>
         <!-- Unique entry point for version number management -->
-        <global.version>5.0.0-Staging</global.version>
+        <global.version>5.0.0</global.version>
     </properties>
 
     <modules>
