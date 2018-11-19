@@ -46,22 +46,12 @@ node('nimble-jenkins-slave') {
             sh 'mvn -f data-channel-service/pom.xml docker:push -DdockerImageTag=latest'
         }
 
-        stage('Deploy') {
+        stage('Deploy MVP') {
             sh 'ssh nimble "cd /data/deployment_setup/prod/ && sudo ./run-prod.sh restart-single data-channel-service"'
         }
+
+        stage('Deploy FMP') {
+            sh 'ssh fmp-prod "cd /srv/nimble-fmp/ && ./run-fmp-prod.sh restart-single data-channel-service"'
+        }
     }
-
-//    if (env.BRANCH_NAME == 'master') {
-//        stage('Push Docker') {
-//            withDockerRegistry([credentialsId: 'NimbleDocker']) {
-//                sh 'docker push nimbleplatform/identity-service:latest'
-//            }
-//        }
-
-//
-//        stage('Apply to Cluster') {
-//            sh 'ssh nimble "cd /data/nimble_setup/ && sudo ./run-prod.sh restart-single identity-service"'
-////            sh 'kubectl apply -f kubernetes/deploy.yml -n prod --validate=false'
-//        }
-//    }
 }
