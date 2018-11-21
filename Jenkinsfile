@@ -33,17 +33,17 @@ node('nimble-jenkins-slave') {
         stage('Deploy') {
             sh 'ssh staging "cd /srv/nimble-staging/ && ./run-staging.sh restart-single data-channel-service"'
         }
-    } else {
-        stage('Build Docker') {
-            sh 'mvn -f data-channel-service/pom.xml docker:build'
-        }
     }
 
     if (env.BRANCH_NAME == 'master') {
+        stage('Build Docker') {
+            sh 'mvn -f data-channel-service/pom.xml docker:build'
+        }
 
         stage('Push Docker') {
-            sh 'mvn -f data-channel-service/pom.xml docker:push'
-            sh 'mvn -f data-channel-service/pom.xml docker:push -DdockerImageTag=latest'
+            sh 'mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version' // fetch dependencies
+            sh 'docker push nimbleplatform/data-channel-service:$(mvn -f data-channel-service/pom.xml org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | grep -v \'\\[\')'
+            sh 'docker push nimbleplatform/data-channel-service:latest'
         }
 
         stage('Deploy MVP') {

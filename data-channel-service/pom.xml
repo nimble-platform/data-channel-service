@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>data-channel-service</artifactId>
-    <version>5.0.0.-Staging</version>
+    <version>5.0.0</version>
     <name>Nimble Data Channel Service</name>
     <description>...</description>
     <packaging>jar</packaging>
