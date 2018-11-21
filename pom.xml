@@ -6,7 +6,7 @@
 
     <groupId>eu.nimble.services</groupId>
     <artifactId>data-channel-service-parent</artifactId>
-    <version>${global.version}</version>
+    <version>static-parent-version</version>
     <name>Parent Project for Data Channel Service</name>
     <packaging>pom</packaging>
 

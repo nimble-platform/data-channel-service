@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>data-channel-service</artifactId>
-    <version>${global.version}</version>
+    <version>5.0.0.-Staging</version>
     <name>Nimble Data Channel Service</name>
     <description>...</description>
     <packaging>jar</packaging>
@@ -36,7 +36,7 @@
     <parent>
         <groupId>eu.nimble.services</groupId>
         <artifactId>data-channel-service-parent</artifactId>
-        <version>${global.version}</version>
+        <version>static-parent-version</version>
         <relativePath>..</relativePath>
     </parent>
 
