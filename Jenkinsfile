@@ -2,26 +2,30 @@
 
 node('nimble-jenkins-slave') {
 
-    stage('Clone and Update') {
-        git(url: 'https://github.com/nimble-platform/data-channel-service.git', branch: env.BRANCH_NAME)
-        sh 'git submodule init'
-        sh 'git submodule update'
-    }
-
-    stage('Build Dependencies') {
-        sh 'rm -rf common'
-        sh 'git clone https://github.com/nimble-platform/common'
-        dir('common') {
-            sh 'git checkout ' + env.BRANCH_NAME
-            sh 'mvn clean install'
-        }
-    }
-
-    stage('Build Java') {
-        sh 'mvn clean install -DskipTests'
-    }
-
+    // -----------------------------------------------
+    // --------------- Staging Branch ----------------
+    // -----------------------------------------------
     if (env.BRANCH_NAME == 'staging') {
+
+        stage('Clone and Update') {
+            git(url: 'https://github.com/nimble-platform/data-channel-service.git', branch: env.BRANCH_NAME)
+            sh 'git submodule init'
+            sh 'git submodule update'
+        }
+
+        stage('Build Dependencies') {
+            sh 'rm -rf common'
+            sh 'git clone https://github.com/nimble-platform/common'
+            dir('common') {
+                sh 'git checkout ' + env.BRANCH_NAME
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Build Java') {
+            sh 'mvn clean install -DskipTests'
+        }
+
         stage('Build Docker') {
             sh 'mvn -f data-channel-service/pom.xml docker:build -DdockerImageTag=staging'
         }
@@ -35,14 +39,66 @@ node('nimble-jenkins-slave') {
         }
     }
 
+    // -----------------------------------------------
+    // ---------------- Master Branch ----------------
+    // -----------------------------------------------
     if (env.BRANCH_NAME == 'master') {
+
+        stage('Clone and Update') {
+            git(url: 'https://github.com/nimble-platform/data-channel-service.git', branch: env.BRANCH_NAME)
+            sh 'git submodule init'
+            sh 'git submodule update'
+        }
+
+        stage('Build Dependencies') {
+            sh 'rm -rf common'
+            sh 'git clone https://github.com/nimble-platform/common'
+            dir('common') {
+                sh 'git checkout ' + env.BRANCH_NAME
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Build Java') {
+            sh 'mvn clean install -DskipTests'
+        }
+    }
+
+    // -----------------------------------------------
+    // ---------------- Release Tags -----------------
+    // -----------------------------------------------
+    if( env.TAG_NAME ==~ /^\d+.\d+.\d+$/) {
+
+        stage('Clone and Update') {
+            git(url: 'https://github.com/nimble-platform/data-channel-service.git', branch: 'master')
+            sh 'git submodule init'
+            sh 'git submodule update'
+        }
+
+        stage('Build Dependencies') {
+            sh 'rm -rf common'
+            sh 'git clone https://github.com/nimble-platform/common'
+            dir('common') {
+                sh 'git checkout master'
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Set version') {
+            sh 'mvn versions:set -DnewVersion=' + env.TAG_NAME
+            sh 'mvn -f data-channel-service/pom.xml versions:set -DnewVersion=' + env.TAG_NAME
+        }
+
+        stage('Build Java') {
+            sh 'mvn clean install -DskipTests'
+        }
+
         stage('Build Docker') {
             sh 'mvn -f data-channel-service/pom.xml docker:build'
         }
 
         stage('Push Docker') {
-            sh 'mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version' // fetch dependencies
-            sh 'docker push nimbleplatform/data-channel-service:$(mvn -f data-channel-service/pom.xml org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | grep -v \'\\[\')'
+            sh 'docker push nimbleplatform/data-channel-service:' + env.TAG_NAME
             sh 'docker push nimbleplatform/data-channel-service:latest'
         }
 
