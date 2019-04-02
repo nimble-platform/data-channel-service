@@ -39,7 +39,6 @@ public class EpcCodes {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -47,7 +46,6 @@ public class EpcCodes {
     public String getOrderId() {
         return orderId;
     }
-
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -55,7 +53,6 @@ public class EpcCodes {
     public Set<String> getCodes() {
         return codes;
     }
-
     public void setCodes(Set<String> codes) {
         this.codes = codes;
     }

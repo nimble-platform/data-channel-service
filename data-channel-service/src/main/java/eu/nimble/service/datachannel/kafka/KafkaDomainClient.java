@@ -89,7 +89,6 @@ public class KafkaDomainClient {
         public String getChannelId() {
             return channelId;
         }
-
         public void setChannelId(String channelId) {
             this.channelId = channelId;
         }
@@ -97,7 +96,6 @@ public class KafkaDomainClient {
         public String getInputTopic() {
             return inputTopic;
         }
-
         public void setInputTopic(String inputTopic) {
             this.inputTopic = inputTopic;
         }
@@ -105,7 +103,6 @@ public class KafkaDomainClient {
         public String getOutputTopic() {
             return outputTopic;
         }
-
         public void setOutputTopic(String outputTopic) {
             this.outputTopic = outputTopic;
         }

@@ -28,7 +28,6 @@ public class Machine {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -36,7 +35,6 @@ public class Machine {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -44,7 +42,6 @@ public class Machine {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -52,7 +49,6 @@ public class Machine {
     public String getOwnerID() {
         return ownerID;
     }
-
     public void setOwnerID(String ownerID) {
         this.ownerID = ownerID;
     }

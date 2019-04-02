@@ -79,7 +79,6 @@ public class ChannelConfiguration {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -87,7 +86,6 @@ public class ChannelConfiguration {
     public String getChannelID() {
         return channelID;
     }
-
     public void setChannelID(String channelID) {
         this.channelID = channelID;
     }
@@ -95,7 +93,6 @@ public class ChannelConfiguration {
     public String getProducerCompanyID() {
         return producerCompanyID;
     }
-
     public void setProducerCompanyID(String producerCompanyID) {
         this.producerCompanyID = producerCompanyID;
     }
@@ -103,7 +100,6 @@ public class ChannelConfiguration {
     public Set<String> getConsumerCompanyIDs() {
         return consumerCompanyIDs;
     }
-
     public void setConsumerCompanyIDs(Set<String> consumerCompanyIDs) {
         this.consumerCompanyIDs = consumerCompanyIDs;
     }
@@ -111,7 +107,6 @@ public class ChannelConfiguration {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -119,7 +114,6 @@ public class ChannelConfiguration {
     public Date getStartDateTime() {
         return startDateTime;
     }
-
     public void setStartDateTime(Date startDateTime) {
         this.startDateTime = startDateTime;
     }
@@ -127,7 +121,6 @@ public class ChannelConfiguration {
     public Date getEndDateTime() {
         return endDateTime;
     }
-
     public void setEndDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
     }
@@ -135,7 +128,6 @@ public class ChannelConfiguration {
     public String getBusinessProcessID() {
         return businessProcessID;
     }
-
     public void setBusinessProcessID(String businessProcessID) {
         this.businessProcessID = businessProcessID;
     }
@@ -143,7 +135,6 @@ public class ChannelConfiguration {
     public String getProducerTopic() {
         return producerTopic;
     }
-
     public void setProducerTopic(String producerTopic) {
         this.producerTopic = producerTopic;
     }
@@ -151,7 +142,6 @@ public class ChannelConfiguration {
     public Map<String, String> getConsumerTopics() {
         return consumerTopics;
     }
-
     public void setConsumerTopics(Map<String, String> consumerTopics) {
         this.consumerTopics = consumerTopics;
     }
@@ -159,7 +149,6 @@ public class ChannelConfiguration {
     public Set<Sensor> getAssociatedSensors() {
         return associatedSensors;
     }
-
     public void setAssociatedSensors(Set<Sensor> associatedSensors) {
         this.associatedSensors = associatedSensors;
     }
