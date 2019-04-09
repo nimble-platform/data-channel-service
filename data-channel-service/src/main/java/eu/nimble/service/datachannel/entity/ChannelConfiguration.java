@@ -21,62 +21,59 @@ public class ChannelConfiguration {
     private String channelID;
 
     @NotNull
-    @ApiModelProperty(value = "ID of seller company", required = true)
-    private String sellerCompanyID;
+    @ApiModelProperty(value = "ID of producing company", required = true)
+    private String producerCompanyID;
 
     @NotNull
-    @ApiModelProperty(value = "ID of buyer company", required = true)
-    private String buyerCompanyID;
+    @ElementCollection(targetClass = String.class)
+    @ApiModelProperty(value = "IDs of consuming companies", required = true)
+    private Set<String> consumerCompanyIDs;
 
+    @NotNull
+    @ApiModelProperty(value = "Description and purpose of data channel", required = true)
+    private String description;
+
+    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    @ApiModelProperty(value = "Opening date/time of data channel", required = true)
+    private java.util.Date startDateTime;
+
+    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    @ApiModelProperty(value = "Closing date/time of data channel", required = true)
+    private java.util.Date endDateTime;
 
     @ApiModelProperty(value = "ID of originating business process (optional)")
     private String businessProcessID;
 
-    @ApiModelProperty(value = "Description and purpose of data channel")
-    private String description;
+    @NotNull
+    @ApiModelProperty(value = "Topic of producer")
+    private String producerTopic;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @ApiModelProperty(value = "Opening date/time of data channel")
-    private java.util.Date startDateTime;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @ApiModelProperty(value = "Closing date/time of data channel")
-    private java.util.Date endDateTime;
-
-    @ApiModelProperty(value = "private or internal; server - default true")
-    private boolean usePrivateServers = true;
-
-    @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
-    private String privateServersType;
+    @NotNull
+    @ElementCollection
+    @MapKeyColumn(name = "name")
+    @Column(name = "value")
+    @CollectionTable(name = "consumer_topics", joinColumns = @JoinColumn(name = "company_id"))
+    @ApiModelProperty(value = "Map for mapping producer company IDs to associated Kafka topics.")
+    private Map<String, String> consumerTopics;
 
     @NotNull
     @ElementCollection(targetClass = Sensor.class)
     @ApiModelProperty(value = "Associated sensors")
     private Set<Sensor> associatedSensors = new HashSet<>();
 
-    @NotNull
-    @ElementCollection(targetClass = Server.class)
-    @ApiModelProperty(value = "Associated private Server configurations")
-    private Set<Server> associatedServers = new HashSet<>();
-
-    @NotNull
-    @ElementCollection(targetClass = Filter.class)
-    @ApiModelProperty(value = "Associated filters")
-    private Set<Filter> associatedFilters = new HashSet<>();
-
-
     public ChannelConfiguration() {
     }
 
-    public ChannelConfiguration(String sellerCompanyID, String buyerCompanyID, String description) {
-        this (null, sellerCompanyID, buyerCompanyID, description);
-    }
-
-    public ChannelConfiguration(String businessProcessID, String sellerCompanyID, String buyerCompanyID, String description) {
-        setSellerCompanyID(sellerCompanyID);
-        setBuyerCompanyID(buyerCompanyID);
-        setDescription(description);
-        setBusinessProcessID(businessProcessID);
+    public ChannelConfiguration(String producerCompanyID, Set<String> consumerCompanyIDs, String description,
+                                Date startDateTime, Date endDateTime, String businessProcessID) {
+        this.producerCompanyID = producerCompanyID;
+        this.consumerCompanyIDs = consumerCompanyIDs;
+        this.description = description;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.businessProcessID = businessProcessID;
     }
 
     public Long getId() {
@@ -89,19 +86,22 @@ public class ChannelConfiguration {
     public String getChannelID() {
         return channelID;
     }
-
-    public String getSellerCompanyID() {
-        return sellerCompanyID;
-    }
-    public void setSellerCompanyID(String sellerCompanyID) {
-        this.sellerCompanyID = sellerCompanyID;
+    public void setChannelID(String channelID) {
+        this.channelID = channelID;
     }
 
-    public String getBuyerCompanyID() {
-        return buyerCompanyID;
+    public String getProducerCompanyID() {
+        return producerCompanyID;
     }
-    public void setBuyerCompanyID(String buyerCompanyID) {
-        this.buyerCompanyID = buyerCompanyID;
+    public void setProducerCompanyID(String producerCompanyID) {
+        this.producerCompanyID = producerCompanyID;
+    }
+
+    public Set<String> getConsumerCompanyIDs() {
+        return consumerCompanyIDs;
+    }
+    public void setConsumerCompanyIDs(Set<String> consumerCompanyIDs) {
+        this.consumerCompanyIDs = consumerCompanyIDs;
     }
 
     public String getDescription() {
@@ -130,25 +130,20 @@ public class ChannelConfiguration {
     }
     public void setBusinessProcessID(String businessProcessID) {
         this.businessProcessID = businessProcessID;
-        if (businessProcessID != null && !"".equals(""))
-            this.channelID = businessProcessID+"-"+sellerCompanyID+"-"+buyerCompanyID;
-        else this.channelID = System.currentTimeMillis()+"-"+sellerCompanyID+"-"+buyerCompanyID;
     }
 
-    public boolean isUsePrivateServers() {
-        return usePrivateServers;
+    public String getProducerTopic() {
+        return producerTopic;
+    }
+    public void setProducerTopic(String producerTopic) {
+        this.producerTopic = producerTopic;
     }
 
-    public void setUsePrivateServers(boolean usePrivateServers) {
-        this.usePrivateServers = usePrivateServers;
+    public Map<String, String> getConsumerTopics() {
+        return consumerTopics;
     }
-
-    public String getPrivateServersType() {
-        return privateServersType;
-    }
-
-    public void setPrivateServersType(String privateServersType) {
-        this.privateServersType = privateServersType;
+    public void setConsumerTopics(Map<String, String> consumerTopics) {
+        this.consumerTopics = consumerTopics;
     }
 
     public Set<Sensor> getAssociatedSensors() {
@@ -156,19 +151,5 @@ public class ChannelConfiguration {
     }
     public void setAssociatedSensors(Set<Sensor> associatedSensors) {
         this.associatedSensors = associatedSensors;
-    }
-
-    public Set<Server> getAssociatedServers() {
-        return associatedServers;
-    }
-    public void setAssociatedServers(Set<Server> associatedServers) {
-        this.associatedServers = associatedServers;
-    }
-
-    public Set<Filter> getAssociatedFilters() {
-        return associatedFilters;
-    }
-    public void setAssociatedFilters(Set<Filter> associatedFilters) {
-        this.associatedFilters = associatedFilters;
     }
 }

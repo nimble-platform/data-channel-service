@@ -27,7 +27,7 @@ public class SwaggerConfig {
         return new ApiInfo(
                 "NIMBLE Data Channel REST API",
                 "REST API for managing data channels on the NIMBLE platform",
-                "2.2",
+                "0.1",
                 null,
                 new Contact("Johannes Innerbichler", null, "johannes.innerbichler@salzburgresearch.at"),
                 "Apache License Version 2.0",

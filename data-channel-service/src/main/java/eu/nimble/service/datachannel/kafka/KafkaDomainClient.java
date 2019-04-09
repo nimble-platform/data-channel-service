@@ -33,7 +33,7 @@ public class KafkaDomainClient {
     private static Logger logger = LoggerFactory.getLogger(KafkaDomainClient.class);
 
     public CreateChannelResponse createChannel(ChannelConfiguration channelConfig) throws UnirestException {
- /*$$TBD for each Sensor
+
         String sourceID = channelConfig.getProducerCompanyID();
         String targetID = channelConfig.getConsumerCompanyIDs().stream().findFirst().get();
 
@@ -58,9 +58,7 @@ public class KafkaDomainClient {
         JSONObject jsonResponse = new JSONObject(response.getBody());
         return new CreateChannelResponse(jsonResponse.getString("channelId"), jsonResponse.getString("inputTopic"),
                 jsonResponse.getString("outputTopic"));
-*/   
-        return new CreateChannelResponse("", "", "");
-}
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void deleteChannel(String channelID) {

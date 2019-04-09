@@ -12,7 +12,7 @@ public interface ChannelConfigurationRepository extends CrudRepository<ChannelCo
 
     Set<ChannelConfiguration> findByBusinessProcessID(String businessProcessID);
 
-    Set<ChannelConfiguration> findBySellerCompanyID(String companyId);
+    Set<ChannelConfiguration> findByProducerCompanyID(String companyId);
 
-    Set<ChannelConfiguration> findByBuyerCompanyID(String companyId);
+    Set<ChannelConfiguration> findByConsumerCompanyIDs(String companyId);
 }
