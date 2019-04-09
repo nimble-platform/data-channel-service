@@ -22,7 +22,7 @@ public class Machine {
     @ApiModelProperty(value = "Description of machine")
     private String description;
 
-    @ApiModelProperty(value = "Owing company ID")
+    @ApiModelProperty(value = "Owner company ID")
     private String ownerID;
 
     public Long getId() {

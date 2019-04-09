@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>data-channel-service</artifactId>
-    <version>5.0.0</version>
+    <version>5.2.3</version>
     <name>Nimble Data Channel Service</name>
     <description>...</description>
     <packaging>jar</packaging>
@@ -47,7 +47,7 @@
         </developer>
     </developers>
 
-    <repositories>
+    <!--repositories>
         <repository>
             <id>bintray-fraunhoferiosb-Maven</id>
             <url>https://dl.bintray.com/fraunhoferiosb/Maven</url>
@@ -55,7 +55,7 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-    </repositories>
+    </repositories-->
 
     <dependencyManagement>
         <dependencies>
@@ -156,11 +156,11 @@
             <artifactId>spring-security-jwt</artifactId>
             <version>1.0.9.RELEASE</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>de.fraunhofer.iosb.ilt</groupId>
             <artifactId>FROST-Client</artifactId>
             <version>0.17</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
@@ -204,13 +204,11 @@
             <artifactId>postgresql</artifactId>
             <version>9.4.1212</version>
         </dependency>
-
-        <dependency>
+        <!-- $$ TBD dependency>
             <groupId>eu.nimble.core.common</groupId>
             <artifactId>data-channel</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
+            <version>0.0.1-privatedatachannel-SNAPSHOT</version>
+        </dependency -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-json-org</artifactId>

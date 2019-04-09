@@ -21,6 +21,9 @@ public class Sensor {
     @ApiModelProperty(value = "Description of sensor")
     private String description;
 
+    @ApiModelProperty(value = "data interval of sensor")
+    private long frequency;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "machineID")
@@ -54,4 +57,15 @@ public class Sensor {
     public void setMachine(Machine machine) {
         this.machine = machine;
     }
+
+    public long getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(long frequency) {
+        this.frequency = frequency;
+    }
+
+
+
 }
