@@ -204,11 +204,11 @@
             <artifactId>postgresql</artifactId>
             <version>9.4.1212</version>
         </dependency>
-        <!-- $$ TBD dependency>
+        <dependency>
             <groupId>eu.nimble.core.common</groupId>
             <artifactId>data-channel</artifactId>
-            <version>0.0.1-privatedatachannel-SNAPSHOT</version>
-        </dependency -->
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-json-org</artifactId>
