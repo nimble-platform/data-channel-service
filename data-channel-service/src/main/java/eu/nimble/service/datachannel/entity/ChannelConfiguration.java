@@ -130,9 +130,9 @@ public class ChannelConfiguration {
     }
     public void setBusinessProcessID(String businessProcessID) {
         this.businessProcessID = businessProcessID;
-        if (businessProcessID != null && !"".equals(""))
-            this.channelID = businessProcessID+"-"+sellerCompanyID+"-"+buyerCompanyID;
-        else this.channelID = System.currentTimeMillis()+"-"+sellerCompanyID+"-"+buyerCompanyID;
+        if (businessProcessID == null || "".equals(businessProcessID))
+            this.businessProcessID = System.currentTimeMillis()+"";
+        this.channelID = this.businessProcessID+"-"+sellerCompanyID+"-"+buyerCompanyID;
     }
 
     public boolean isUsePrivateServers() {

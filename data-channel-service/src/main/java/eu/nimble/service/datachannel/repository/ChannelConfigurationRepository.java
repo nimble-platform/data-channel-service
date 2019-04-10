@@ -10,7 +10,7 @@ import java.util.Set;
 public interface ChannelConfigurationRepository extends CrudRepository<ChannelConfiguration, Long> {
     ChannelConfiguration findOneByChannelID(String channelID);
 
-    Set<ChannelConfiguration> findByBusinessProcessID(String businessProcessID);
+    ChannelConfiguration findOneByBusinessProcessID(String businessProcessID);
 
     Set<ChannelConfiguration> findBySellerCompanyID(String companyId);
 

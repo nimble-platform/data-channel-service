@@ -67,10 +67,22 @@ public class ChannelController implements ChannelAPI{
             throws IOException, UnirestException {
 
         // check if company id matches; TBD : solve Exception with partyID
-        //String companyID = "11257";
-        //$$if (createChannelRequest.getProducerCompanyID().equals(companyID) == false) {
-        //$$    return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        //$$}
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(createChannelRequest, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        //verify if yet present / it cannot be unique because of we have to permit to decide businessProcessID also in another step then the creation (need to be verified in BPM).
+        if (createChannelRequest.getBusinessProcessID() != null && !"".equals(createChannelRequest.getBusinessProcessID())) {
+            ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByBusinessProcessID( createChannelRequest.getBusinessProcessID() );
+            if (channelConfiguration != null) {
+                //duplicated businessProcessID
+                if (isAuthorized(channelConfiguration, companyID) == true) {
+                    return new ResponseEntity<>(channelConfiguration, HttpStatus.BAD_REQUEST);
+                } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
 
         // create channel configuration
         ChannelConfiguration config = new ChannelConfiguration(
@@ -85,7 +97,6 @@ public class ChannelController implements ChannelAPI{
         //$$config.setChannelID(response.getChannelId());
 
         config = channelConfigurationRepository.save(config);
-
         logger.info("Company {} opened channel ", createChannelRequest.getSellerCompanyID());
         return new ResponseEntity<>(new CreateChannel.Response(config.getChannelID()), HttpStatus.OK);
     }
@@ -222,9 +233,9 @@ public class ChannelController implements ChannelAPI{
     }
 
     //--------------------------------------------------------------------------------------
-    // getChannelsForBusinessProcessService (e.g. businessProcessID = "444")
+    // getChannelForBusinessProcessService (e.g. businessProcessID = "444")
     //--------------------------------------------------------------------------------------
-    public ResponseEntity<?> getChannelsForBusinessProcessService(
+    public ResponseEntity<?> getChannelForBusinessProcessService(
             @ApiParam(value = "businessProcessID", required = true)
             @PathVariable String businessProcessID,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
@@ -232,10 +243,10 @@ public class ChannelController implements ChannelAPI{
             throws IOException, UnirestException {
 
         String companyID = identityResolver.resolveCompanyId(bearer); // extract ID of company
-        Set<ChannelConfiguration> channels = this.channelConfigurationRepository.findByBusinessProcessID(businessProcessID);
+        ChannelConfiguration channel = this.channelConfigurationRepository.findOneByBusinessProcessID(businessProcessID);
 
         logger.info("Company {} requested associated channels for business process with ID {}", companyID, businessProcessID);
-        return new ResponseEntity<>(channels, HttpStatus.OK);
+        return new ResponseEntity<>(channel, HttpStatus.OK);
     }
 
     //--------------------------------------------------------------------------------------
@@ -403,6 +414,11 @@ public class ChannelController implements ChannelAPI{
     //--------------------------------------------------------------------------------------
     // isAuthorized
     //--------------------------------------------------------------------------------------
+    private Boolean isAuthorized(CreateChannel.Request createChannelRequest, String companyID) {
+        return createChannelRequest.getBuyerCompanyID().equals(companyID)
+                || createChannelRequest.getSellerCompanyID().contains(companyID);
+    }
+
     private Boolean isAuthorized(ChannelConfiguration channelConfiguration, String companyID) {
         return channelConfiguration.getBuyerCompanyID().equals(companyID)
                 || channelConfiguration.getSellerCompanyID().contains(companyID);

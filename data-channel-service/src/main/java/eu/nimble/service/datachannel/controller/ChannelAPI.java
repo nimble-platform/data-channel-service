@@ -32,7 +32,7 @@ public interface ChannelAPI {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channel created", response = CreateChannel.Response.class),
             @ApiResponse(code = 201, message = "Created"),
-            @ApiResponse(code = 400, message = "Error while creating channel"),
+            @ApiResponse(code = 400, message = "Error while creating channel/duplicate businessProcessID"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not Found") })
@@ -173,16 +173,16 @@ public interface ChannelAPI {
      * @return See API documentation
      * @throws UnirestException Error while communication with the Identity Service
      */
-    @ApiOperation(value = "Get all associated channels for a business process", nickname = "getChannelsForBusinessProcessService",
+    @ApiOperation(value = "Get associated channel for a business process", nickname = "getChannelForBusinessProcessService",
             response = ChannelConfiguration.class, responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Channels found", response = ChannelConfiguration.class, responseContainer = "List"),
-            @ApiResponse(code = 400, message = "Error while fetching channels"),
+            @ApiResponse(code = 200, message = "Channel found", response = ChannelConfiguration.class, responseContainer = "List"),
+            @ApiResponse(code = 400, message = "Error while fetching channel"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not Found") })
     @RequestMapping(value = "/business-process/{businessProcessID}", produces = {"application/json"}, method = RequestMethod.GET)
-    ResponseEntity<?> getChannelsForBusinessProcessService(
+    ResponseEntity<?> getChannelForBusinessProcessService(
             @ApiParam(value = "businessProcessID", required = true)
             @PathVariable String businessProcessID,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
