@@ -68,10 +68,6 @@ public class ChannelConfiguration {
     public ChannelConfiguration() {
     }
 
-    public ChannelConfiguration(String sellerCompanyID, String buyerCompanyID, String description) {
-        this (null, sellerCompanyID, buyerCompanyID, description);
-    }
-
     public ChannelConfiguration(String businessProcessID, String sellerCompanyID, String buyerCompanyID, String description) {
         setSellerCompanyID(sellerCompanyID);
         setBuyerCompanyID(buyerCompanyID);

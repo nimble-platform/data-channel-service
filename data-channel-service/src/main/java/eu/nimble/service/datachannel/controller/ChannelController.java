@@ -73,14 +73,12 @@ public class ChannelController implements ChannelAPI{
         }
 
         //verify if yet present / it cannot be unique because of we have to permit to decide businessProcessID also in another step then the creation (need to be verified in BPM).
-        if (createChannelRequest.getBusinessProcessID() != null && !"".equals(createChannelRequest.getBusinessProcessID())) {
-            ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByBusinessProcessID( createChannelRequest.getBusinessProcessID() );
-            if (channelConfiguration != null) {
-                //duplicated businessProcessID
-                if (isAuthorized(channelConfiguration, companyID) == true) {
-                    return new ResponseEntity<>(channelConfiguration, HttpStatus.BAD_REQUEST);
-                } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByBusinessProcessID( createChannelRequest.getBusinessProcessID() );
+        if (channelConfiguration != null) {
+            //duplicated businessProcessID
+            if (isAuthorized(channelConfiguration, companyID) == true) {
+                return new ResponseEntity<>(channelConfiguration, HttpStatus.BAD_REQUEST);
+            } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
 
