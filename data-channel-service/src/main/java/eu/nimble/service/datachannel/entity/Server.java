@@ -26,7 +26,7 @@ public class Server {
 
     @NotNull
     @ApiModelProperty(value = "Priority order")
-    private int priority;
+    private int priority=1;
 
     @NotNull
     @ApiModelProperty(value = "server name")
@@ -34,7 +34,7 @@ public class Server {
 
     @NotNull
     @ApiModelProperty(value = "Storage duration")
-    private int duration;
+    private int duration=12;
 
     @NotNull
     @ApiModelProperty(value = "description")
@@ -60,11 +60,6 @@ public class Server {
     @ApiModelProperty(value = "additional config parameters")
     private String additionalParameters;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "channelID")
-    @ApiModelProperty(value = "Channel Configuration")
-    private ChannelConfiguration channelConfiguration;
 
     public Long getId() {
         return id;
