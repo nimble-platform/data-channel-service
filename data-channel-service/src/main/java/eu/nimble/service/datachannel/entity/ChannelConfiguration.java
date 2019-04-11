@@ -64,7 +64,9 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "Associated filters")
     private Set<Filter> associatedFilters = new HashSet<>();
 
-
+//$$tbd Negoziation
+    
+    
     public ChannelConfiguration() {
     }
 
