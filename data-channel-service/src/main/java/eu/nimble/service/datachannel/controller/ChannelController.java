@@ -177,8 +177,7 @@ public class ChannelController implements ChannelAPI{
         //$$ set Start Date and if internal create topics
         // set up channel in the Kafka domain -> this will be moved to Channel.start()
         //$$KafkaDomainClient.CreateChannelResponse response = kafkaDomainClient.createChannel(config);
-        // update and save channel configuration
-        //$$config.setChannelID(response.getChannelId());
+        //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
 
 
         logger.info("Company {} requested starting of channel with ID {}", companyID, channelID);
