@@ -44,18 +44,11 @@ public class Server {
     @ApiModelProperty(value = "Datasource url")
     private String url;
 
-    @ApiModelProperty(value = "Seller login")
-    private String sellerLogin;
+    @ApiModelProperty(value = "login")
+    private String login;
 
-    @ApiModelProperty(value = "Seller password")
-    private String sellerPassword;
-
-    @ApiModelProperty(value = "Buyer login")
-    private String buyerLogin;
-
-    @ApiModelProperty(value = "Buyer password")
-    private String buyerPassword;
-
+    @ApiModelProperty(value = "loginPw")
+    private String loginPw;
 
     @ApiModelProperty(value = "additional config parameters")
     private String additionalParameters;
@@ -84,37 +77,23 @@ public class Server {
         this.url = url;
     }
 
-    public String getSellerLogin() {
-        return sellerLogin;
+    public String getLogin() {
+        return login;
     }
 
-    public void setSellerLogin(String sellerLogin) {
-        this.sellerLogin = sellerLogin;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
-    public String getSellerPassword() {
-        return sellerPassword;
+
+    public String getLoginPw() {
+        return loginPw;
     }
 
-    public void setSellerPassword(String sellerPassword) {
-        this.sellerPassword = sellerPassword;
+    public void setLoginPw(String loginPw) {
+        this.loginPw = loginPw;
     }
 
-    public String getBuyerLogin() {
-        return buyerLogin;
-    }
-
-    public void setBuyerLogin(String buyerLogin) {
-        this.buyerLogin = buyerLogin;
-    }
-
-    public String getBuyerPassword() {
-        return buyerPassword;
-    }
-
-    public void setBuyerPassword(String buyerPassword) {
-        this.buyerPassword = buyerPassword;
-    }
 
     public String getAdditionalParameters() {
         return additionalParameters;

@@ -22,7 +22,7 @@ public class Sensor {
     private String description;
 
     @ApiModelProperty(value = "data interval of sensor")
-    private long frequency;
+    private long interval;
 
     @NotNull
     @ManyToOne
@@ -58,12 +58,12 @@ public class Sensor {
         this.machine = machine;
     }
 
-    public long getFrequency() {
-        return frequency;
+    public long getInterval() {
+        return interval;
     }
 
-    public void setFrequency(long frequency) {
-        this.frequency = frequency;
+    public void setInterval(long interval) {
+        this.interval = interval;
     }
 
 
