@@ -11,6 +11,7 @@ import eu.nimble.service.datachannel.kafka.KafkaDomainClient;
 import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
 import eu.nimble.service.datachannel.repository.MachineRepository;
 import eu.nimble.service.datachannel.repository.SensorRepository;
+import eu.nimble.service.datachannel.repository.ServerRepository;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +55,16 @@ public class ChannelController implements ChannelAPI{
     private SensorRepository sensorRepository;
 
     @Autowired
+    private ServerRepository serverRepository;
+
+    @Autowired
     private MachineRepository machineRepository;
 
     //--------------------------------------------------------------------------------------
     // createChannel
     //--------------------------------------------------------------------------------------
     public ResponseEntity<?> createChannel(
-            @ApiParam(value = "Channel configuration", required = true)
+            @ApiParam(value = "Channel configuration",  required = true)
             @RequestBody CreateChannel.Request createChannelRequest,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
@@ -88,11 +92,6 @@ public class ChannelController implements ChannelAPI{
                 createChannelRequest.getSellerCompanyID(),
                 createChannelRequest.getBuyerCompanyID(),
                 createChannelRequest.getDescription());
-
-        // set up channel in the Kafka domain -> this will be moved to Channel.start()
-        //$$KafkaDomainClient.CreateChannelResponse response = kafkaDomainClient.createChannel(config);
-        // update and save channel configuration
-        //$$config.setChannelID(response.getChannelId());
 
         config = channelConfigurationRepository.save(config);
         logger.info("Company {} opened channel ", createChannelRequest.getSellerCompanyID());
@@ -176,6 +175,10 @@ public class ChannelController implements ChannelAPI{
         }
 
         //$$ set Start Date and if internal create topics
+        // set up channel in the Kafka domain -> this will be moved to Channel.start()
+        //$$KafkaDomainClient.CreateChannelResponse response = kafkaDomainClient.createChannel(config);
+        //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
+
 
         logger.info("Company {} requested starting of channel with ID {}", companyID, channelID);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -349,7 +352,24 @@ public class ChannelController implements ChannelAPI{
             @ApiParam(value = "channelID", required = true) @PathVariable String channelID,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        List<Server> sortedServers = channelConfiguration.getAssociatedServers().stream()
+                .sorted(Comparator.comparing(Server::getPriority))
+                .collect(Collectors.toList());
+
+        logger.info("Company {} requested servers of channel {}", companyID, channelID);
+        return new ResponseEntity<>(sortedServers, HttpStatus.OK);
     }
 
 
@@ -361,7 +381,28 @@ public class ChannelController implements ChannelAPI{
             @ApiParam(value = "Server to be added", required = true) @RequestBody Server server,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // store server
+        serverRepository.save(server);
+
+        // add sensor to channel
+        Set<Server> configuredServers = channelConfiguration.getAssociatedServers();
+        configuredServers.add(server);
+        channelConfigurationRepository.save(channelConfiguration);
+
+        logger.info("Company {} added server {}", companyID, server.getName());
+        return new ResponseEntity<>(server, HttpStatus.OK);
     }
 
     //--------------------------------------------------------------------------------------
@@ -373,7 +414,26 @@ public class ChannelController implements ChannelAPI{
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
 
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // remove server from channel
+        Set<Server> associatedServers = channelConfiguration.getAssociatedServers().stream()
+                .filter( s -> !s.getId().equals(serverID))
+                .collect(Collectors.toSet());
+        channelConfiguration.setAssociatedServers(associatedServers);
+        channelConfigurationRepository.save(channelConfiguration);
+
+        for(Server server: associatedServers) logger.info("Company {} removed server {}", companyID, server.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

@@ -22,7 +22,6 @@ public interface ChannelAPI {
      * @param createChannelRequest Configuration, which is used for opening the channel
      * @param bearer               OpenID Connect token storing requesting identity
      * @return ResponseEntity with ID of created data channel
-     * @throws IOException      Error while communicating with the SensorThings Server
      * @throws UnirestException Error while communication with the Identity Service
      */
     @ApiOperation(value = "Create new channel", notes = "Creates a new channel according to the provided contract. " +

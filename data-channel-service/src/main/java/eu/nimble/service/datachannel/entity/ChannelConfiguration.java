@@ -65,11 +65,10 @@ public class ChannelConfiguration {
     private Set<Filter> associatedFilters = new HashSet<>();
 
 //$$tbd Negoziation
-    
-    
-    public ChannelConfiguration() {
-    }
 
+    public ChannelConfiguration() {
+
+    }
     public ChannelConfiguration(String businessProcessID, String sellerCompanyID, String buyerCompanyID, String description) {
         setSellerCompanyID(sellerCompanyID);
         setBuyerCompanyID(buyerCompanyID);
