@@ -21,10 +21,6 @@ public class Server {
     private Long id;
 
     @NotNull
-    @ApiModelProperty(value = "Owner company ID")
-    private String ownerID;
-
-    @NotNull
     @ApiModelProperty(value = "Priority order")
     private int priority=1;
 
@@ -33,25 +29,33 @@ public class Server {
     private String name;
 
     @NotNull
+    @ApiModelProperty(value = "Datasource url address")
+    private String address;
+
+    @NotNull
     @ApiModelProperty(value = "Storage duration")
-    private int duration=12;
+    private String duration="12";
+
+    @NotNull
+    @ApiModelProperty(value = "Owner company ID")
+    private String ownership;
+
+    @ApiModelProperty(value = "login")
+    private String login;
+
+    @ApiModelProperty(value = "loginPW")
+    private String loginPW;
 
     @NotNull
     @ApiModelProperty(value = "description")
     private String description;
 
-    @NotNull
-    @ApiModelProperty(value = "Datasource url")
-    private String url;
 
-    @ApiModelProperty(value = "login")
-    private String login;
 
-    @ApiModelProperty(value = "loginPw")
-    private String loginPw;
 
-    @ApiModelProperty(value = "additional config parameters")
-    private String additionalParameters;
+
+    //@ApiModelProperty(value = "additional config parameters")
+    //private String additionalParameters;
 
 
     public Long getId() {
@@ -61,20 +65,20 @@ public class Server {
         this.id = id;
     }
 
-    public String getOwnerID() {
-        return ownerID;
+    public String getOwnership() {
+        return ownership;
     }
 
-    public void setOwnerID(String ownerID) {
-        this.ownerID = ownerID;
+    public void setOwnership(String ownerID) {
+        this.ownership = ownerID;
     }
 
-    public String getUrl() {
-        return url;
+    public String getAddress() {
+        return address;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setAddress(String url) {
+        this.address = url;
     }
 
     public String getLogin() {
@@ -86,22 +90,22 @@ public class Server {
     }
 
 
-    public String getLoginPw() {
-        return loginPw;
+    public String getloginPW() {
+        return loginPW;
     }
 
-    public void setLoginPw(String loginPw) {
-        this.loginPw = loginPw;
+    public void setLoginPw(String loginPW) {
+        this.loginPW = loginPW;
     }
 
 
-    public String getAdditionalParameters() {
-        return additionalParameters;
-    }
+    //public String getAdditionalParameters() {
+    //    return additionalParameters;
+    //}
 
-    public void setAdditionalParameters(String additionalParameters) {
-        this.additionalParameters = additionalParameters;
-    }
+    //public void setAdditionalParameters(String additionalParameters) {
+    //    this.additionalParameters = additionalParameters;
+    //}
 
 
     public int getPriority() {
@@ -120,11 +124,11 @@ public class Server {
         this.name = name;
     }
 
-    public int getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
