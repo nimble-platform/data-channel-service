@@ -175,13 +175,15 @@ public class ChannelController implements ChannelAPI{
         }
 
         //$$ set Start Date and if internal create topics
+        channelConfiguration.setStartDateTime( new java.util.Date() );
+        channelConfigurationRepository.save(channelConfiguration);
         // set up channel in the Kafka domain -> this will be moved to Channel.start()
         //$$KafkaDomainClient.CreateChannelResponse response = kafkaDomainClient.createChannel(config);
         //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
 
 
         logger.info("Company {} requested starting of channel with ID {}", companyID, channelID);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
     }
 
     //--------------------------------------------------------------------------------------
@@ -209,8 +211,10 @@ public class ChannelController implements ChannelAPI{
         //kafkaDomainClient.deleteChannel(channelConfiguration.getChannelID()); // cleanup topics
         //channelConfigurationRepository.delete(channelConfiguration); // delete configuration
 
+        channelConfiguration.setEndDateTime( new java.util.Date() );
+        channelConfigurationRepository.save(channelConfiguration);
         logger.info("Company {} requested closing of channel with ID {}", companyID, channelID);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
     }
 
     //--------------------------------------------------------------------------------------
