@@ -27,13 +27,11 @@ import java.util.Map;
 @Service
 public class KafkaDomainClient {
 
-    @Value("${nimble.kafka-domain.service-url}")
-    private String kafkaDomainUrl;
-
     private static Logger logger = LoggerFactory.getLogger(KafkaDomainClient.class);
 
-    public CreateChannelResponse createChannel(ChannelConfiguration channelConfig) throws UnirestException {
+    public CreateChannelResponse createChannel(String kafkaDomainUrl, ChannelConfiguration channelConfig) throws UnirestException {
  /*$$TBD for each Sensor
+        this.kafkaDomainUrl = kafkaDomainUrl;
         String sourceID = channelConfig.getProducerCompanyID();
         String targetID = channelConfig.getConsumerCompanyIDs().stream().findFirst().get();
 

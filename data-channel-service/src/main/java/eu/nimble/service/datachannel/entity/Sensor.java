@@ -15,6 +15,10 @@ public class Sensor {
     private Long id;
 
     @NotNull
+    @ApiModelProperty(value = "Owner company ID")
+    private String ownership;
+
+    @NotNull
     @ApiModelProperty(value = "Name of sensor")
     private String name;
 
@@ -23,6 +27,16 @@ public class Sensor {
 
     @ApiModelProperty(value = "data interval of sensor")
     private long interval;
+
+    @ApiModelProperty(value = "Key of sensor data (optional) - example READINGID")
+    private String dataKey;
+
+    @ApiModelProperty(value = "Metadata of sensor (optional) - example READINGID BIGINT, LATITUDE DOUBLE,  LONGITUDE DOUBLE, TEMPERATURE DOUBLE, UNITS VARCHAR, LOCATION.NAME VARCHAR, LOCATION.ADRESS VARCHAR, LOCATION.CONTACTS.TELEPHONE VARCHAR, LOCATION.CONTACTS.WEB VARCHAR")
+    private String metadata;
+
+    @ApiModelProperty(value = "Advanced Filtering (optional, only if filtering server is enabled) - in order to create views or subset for this sensor")
+    private String advancedFiltering;
+
 
     @NotNull
     @ManyToOne
@@ -66,6 +80,36 @@ public class Sensor {
         this.interval = interval;
     }
 
+    public String getMetadata() {
+        return metadata;
+    }
 
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public String getDataKey() {
+        return dataKey;
+    }
+
+    public void setDataKey(String dataKey) {
+        this.dataKey = dataKey;
+    }
+
+    public String getAdvancedFiltering() {
+        return advancedFiltering;
+    }
+
+    public void setAdvancedFiltering(String advancedFiltering) {
+        this.advancedFiltering = advancedFiltering;
+    }
+
+    public String getOwnership() {
+        return ownership;
+    }
+
+    public void setOwnership(String ownership) {
+        this.ownership = ownership;
+    }
 
 }

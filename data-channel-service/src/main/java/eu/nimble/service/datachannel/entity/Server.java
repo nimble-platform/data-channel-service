@@ -94,18 +94,9 @@ public class Server {
         return loginPW;
     }
 
-    public void setLoginPw(String loginPW) {
+    public void setLoginPW(String loginPW) {
         this.loginPW = loginPW;
     }
-
-
-    //public String getAdditionalParameters() {
-    //    return additionalParameters;
-    //}
-
-    //public void setAdditionalParameters(String additionalParameters) {
-    //    this.additionalParameters = additionalParameters;
-    //}
 
 
     public int getPriority() {

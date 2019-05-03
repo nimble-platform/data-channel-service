@@ -4,7 +4,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
 import eu.nimble.service.datachannel.entity.Sensor;
 import eu.nimble.service.datachannel.entity.Server;
-import eu.nimble.service.datachannel.entity.Filter;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,32 +67,6 @@ public interface ChannelAPI {
             throws IOException, UnirestException;
 
 
-    /**
-     * See API documentation
-     *
-     * @param channelID Identifier of requested channel.
-     * @param businessProcessID Identifier business process.
-     * @param bearer    OpenID Connect token storing requesting identity
-     * @return See API documentation
-     * @throws UnirestException Error while communication with the Identity Service
-     */
-    @ApiOperation(value = "Set businessProcessID into channel with id", response = ChannelConfiguration.class, nickname = "associateChannelBusinessProcessID")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Channel found", response = ChannelConfiguration.class),
-            @ApiResponse(code = 400, message = "Error while fetching channel"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Channel not found") })
-    @RequestMapping(value = "/{channelID}/setBusinessProcessID", produces = {"application/json"}, method = RequestMethod.POST)
-    ResponseEntity<?> associateChannelBusinessProcessID(
-            @ApiParam(value = "channelID", required = true)
-            @PathVariable String channelID,
-            @ApiParam(value = "businessProcessID", required = true)
-            @PathVariable String businessProcessID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer)
-            throws IOException, UnirestException;
-            
      /**
      * See API documentation
      *
@@ -221,30 +194,6 @@ public interface ChannelAPI {
      * @return See API documentation
      * @throws UnirestException Error while communication with the Identity Service
      */
-    @ApiOperation(value = "Get filters of channel.", response = Filter.class,
-            notes = "Returns list of filters sorted by ID", nickname = "getFiltersForChannel", responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Channel found", response = Filter.class, responseContainer = "List"),
-            @ApiResponse(code = 400, message = "Error while fetching channel"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Channel not found") })
-    @RequestMapping(value = "/{channelID}/filters", produces = {"application/json"}, method = RequestMethod.GET)
-    ResponseEntity<?> getFiltersForChannel(
-            @ApiParam(value = "channelID", required = true)
-            @PathVariable String channelID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer)
-            throws IOException, UnirestException;
-
-    /**
-     * See API documentation
-     *
-     * @param channelID Identifier of requested channel.
-     * @param bearer    OpenID Connect token storing requesting identity
-     * @return See API documentation
-     * @throws UnirestException Error while communication with the Identity Service
-     */
     @ApiOperation(value = "Get servers of channel.", response = Server.class,
             notes = "Returns list of servers sorted by priority asc", nickname = "getServersForChannel", responseContainer = "List")
     @ApiResponses(value = {
@@ -281,8 +230,8 @@ public interface ChannelAPI {
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Channel not found"),
             @ApiResponse(code = 409, message = "Sensor already exists") })
-    @RequestMapping(value = "/{channelID}/sensors", produces = {"application/json"}, method = RequestMethod.POST)
-    ResponseEntity<?> addSensorsForChannel(
+    @RequestMapping(value = "/{channelID}/sensor", produces = {"application/json"}, method = RequestMethod.POST)
+    ResponseEntity<?> addSensorForChannel(
             @ApiParam(value = "channelID", required = true)
             @PathVariable String channelID,
             @ApiParam(value = "Sensor to be added", required = true)
@@ -296,42 +245,12 @@ public interface ChannelAPI {
      * See API documentation
      *
      * @param channelID Identifier of requested channel.
-     * @param filter    filtes(s) to be added
-     * @param bearer    OpenID Connect token storing requesting identity
-     * @return See API documentation
-     * @throws UnirestException Error while communication with the Identity Service
-     */
-    @ApiOperation(value = "Add filter to channel.", response = Filter.class,
-            notes = "Add a filter to a channel", nickname = "getFiltersForChannel")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Filter added", response = Sensor.class),
-            @ApiResponse(code = 201, message = "Created"),
-            @ApiResponse(code = 400, message = "Error while fetching channel"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Channel not found"),
-            //@ApiResponse(code = 409, message = "Filter already exists") //overwrite existing filter
-    })
-    @RequestMapping(value = "/{channelID}/filters", produces = {"application/json"}, method = RequestMethod.POST)
-    ResponseEntity<?> addFiltersForChannel(
-            @ApiParam(value = "channelID", required = true)
-            @PathVariable String channelID,
-            @ApiParam(value = "Filter to be added", required = true)
-            @RequestBody Filter filter,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer)
-            throws IOException, UnirestException;
-
-    /**
-     * See API documentation
-     *
-     * @param channelID Identifier of requested channel.
      * @param server    server(s) to be added
      * @param bearer    OpenID Connect token storing requesting identity
      * @return See API documentation
      * @throws UnirestException Error while communication with the Identity Service
      */
-    @ApiOperation(value = "Add server to channel.", response = Filter.class,
+    @ApiOperation(value = "Add server to channel.", response = Server.class,
             notes = "Add a server to a channel", nickname = "getServersForChannel")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Server added", response = Sensor.class),
@@ -342,8 +261,8 @@ public interface ChannelAPI {
             @ApiResponse(code = 404, message = "Channel not found"),
             @ApiResponse(code = 409, message = "Server already exists")
     })
-    @RequestMapping(value = "/{channelID}/servers", produces = {"application/json"}, method = RequestMethod.POST)
-    ResponseEntity<?> addServersForChannel(
+    @RequestMapping(value = "/{channelID}/server", produces = {"application/json"}, method = RequestMethod.POST)
+    ResponseEntity<?> addServerForChannel(
             @ApiParam(value = "channelID", required = true)
             @PathVariable String channelID,
             @ApiParam(value = "Server to be added", required = true)
@@ -381,40 +300,11 @@ public interface ChannelAPI {
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;
 
-        /**
+    /**
      * See API documentation
      *
      * @param channelID Identifier of requested channel.
-     * @param filterID  ID of filter to be removed
-     * @param bearer    OpenID Connect token storing requesting identity
-     * @return See API documentation
-     * @throws UnirestException Error while communication with the Identity Service
-     */
-    @ApiOperation(value = "Remove filter from channel.",
-            notes = "Remove a filter from a channel", nickname = "removeFilterForChannel")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Filter removed", response = Object.class),
-            @ApiResponse(code = 204, message = "No Content"),
-            @ApiResponse(code = 400, message = "Error while fetching channel"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Filter or channel not found") })
-    @RequestMapping(value = "/{channelID}/filters/{filterID}", method = RequestMethod.DELETE)
-    ResponseEntity<?> removeFilterForChannel(
-            @ApiParam(value = "ID of channel", required = true)
-            @PathVariable String channelID,
-            @ApiParam(value = "SensorID to be removed", required = true)
-            @PathVariable Long filterID,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer)
-            throws IOException, UnirestException;
-
-    
-        /**
-     * See API documentation
-     *
-     * @param channelID Identifier of requested channel.
-     * @param sensorID  ID of sensor to be removed
+     * @param serverID  ID of server to be removed
      * @param bearer    OpenID Connect token storing requesting identity
      * @return See API documentation
      * @throws UnirestException Error while communication with the Identity Service
@@ -422,12 +312,12 @@ public interface ChannelAPI {
     @ApiOperation(value = "Remove server from channel.",
             notes = "Remove a server from a channel", nickname = "removeServerForChannel")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Sensor removed", response = Object.class),
+            @ApiResponse(code = 200, message = "Server removed", response = Object.class),
             @ApiResponse(code = 204, message = "No Content"),
             @ApiResponse(code = 400, message = "Error while fetching channel"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Sensor or channel not found") })
+            @ApiResponse(code = 404, message = "Server or channel not found") })
     @RequestMapping(value = "/{channelID}/server/{serverID}", method = RequestMethod.DELETE)
     ResponseEntity<?> removeServerForChannel(
             @ApiParam(value = "ID of channel", required = true)
@@ -438,5 +328,72 @@ public interface ChannelAPI {
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;
 
-    
+ 
+    //--------------------------------------------------------------------------------------
+    // hasInternalService
+    //--------------------------------------------------------------------------------------
+    /**
+     * See API documentation
+     *
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Control if this Nimble Instance has internal server avaiable",
+            notes = "Control if this Nimble Instance has internal server avaiable", nickname = "hasInternalService")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "", response = Boolean.class),
+            @ApiResponse(code = 404, message = "Service not found", response = Boolean.class)
+            } )
+    @RequestMapping(value = "/hasInternalService", method = RequestMethod.GET)
+    ResponseEntity<?> hasInternalService (
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
+    //--------------------------------------------------------------------------------------
+    // hasFilteringService
+    //--------------------------------------------------------------------------------------
+    @ApiOperation(value = "Control if this Nimble Instance has filtering server avaiable",
+            notes = "Control if this Nimble Instance has filtering server avaiable", nickname = "hasFilteringService")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "", response = Boolean.class),
+            @ApiResponse(code = 404, message = "Service not found", response = Boolean.class)
+            } )
+    @RequestMapping(value = "/hasFilteringService", method = RequestMethod.GET)
+    ResponseEntity<?> hasFilteringService (
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
+    //--------------------------------------------------------------------------------------
+    // getFilteringServiceUrl
+    //--------------------------------------------------------------------------------------
+    @ApiOperation(value = "get filtering server url",
+            notes = "get filtering server url", nickname = "getFilteringServiceUrl")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "", response = String.class),
+            @ApiResponse(code = 404, message = "Service not found")
+            } )
+    @RequestMapping(value = "/getFilteringServiceUrl", method = RequestMethod.GET)
+    ResponseEntity<?> getFilteringServiceUrl (
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
+    //--------------------------------------------------------------------------------------
+    // getProducerServiceUrl
+    //--------------------------------------------------------------------------------------
+    @ApiOperation(value = "get producer server url",
+            notes = "get producer server url", nickname = "getProducerServiceUrl")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "", response = String.class),
+            @ApiResponse(code = 404, message = "Service not found")
+            } )
+    @RequestMapping(value = "/getProducerServiceUrl", method = RequestMethod.GET)
+    ResponseEntity<?> getProducerServiceUrl (
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
 }

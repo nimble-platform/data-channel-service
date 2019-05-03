@@ -49,6 +49,9 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
     private String privateServersType;
 
+    @ApiModelProperty(value = "use advanced filter - default false")
+    private boolean useAdvancedFilters = false;
+
     @NotNull
     @ElementCollection(targetClass = Sensor.class)
     @ApiModelProperty(value = "Associated sensors")
@@ -58,11 +61,6 @@ public class ChannelConfiguration {
     @ElementCollection(targetClass = Server.class)
     @ApiModelProperty(value = "Associated private Server configurations")
     private Set<Server> associatedServers = new HashSet<>();
-
-    @NotNull
-    @ElementCollection(targetClass = Filter.class)
-    @ApiModelProperty(value = "Associated filters")
-    private Set<Filter> associatedFilters = new HashSet<>();
 
 //$$tbd Negoziation
 
@@ -162,10 +160,12 @@ public class ChannelConfiguration {
         this.associatedServers = associatedServers;
     }
 
-    public Set<Filter> getAssociatedFilters() {
-        return associatedFilters;
+    public boolean isUseAdvancedFilters() {
+        return useAdvancedFilters;
     }
-    public void setAssociatedFilters(Set<Filter> associatedFilters) {
-        this.associatedFilters = associatedFilters;
+
+    public void setUseAdvancedFilters(boolean useAdvancedFilters) {
+        this.useAdvancedFilters = useAdvancedFilters;
     }
+
 }
