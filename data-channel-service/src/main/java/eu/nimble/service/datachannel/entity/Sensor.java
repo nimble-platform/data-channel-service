@@ -15,10 +15,6 @@ public class Sensor {
     private Long id;
 
     @NotNull
-    @ApiModelProperty(value = "Owner company ID")
-    private String ownership;
-
-    @NotNull
     @ApiModelProperty(value = "Name of sensor")
     private String name;
 
@@ -102,14 +98,6 @@ public class Sensor {
 
     public void setAdvancedFiltering(String advancedFiltering) {
         this.advancedFiltering = advancedFiltering;
-    }
-
-    public String getOwnership() {
-        return ownership;
-    }
-
-    public void setOwnership(String ownership) {
-        this.ownership = ownership;
     }
 
 }

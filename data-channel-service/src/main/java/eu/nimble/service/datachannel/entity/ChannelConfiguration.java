@@ -29,7 +29,7 @@ public class ChannelConfiguration {
     private String buyerCompanyID;
 
 
-    @ApiModelProperty(value = "ID of originating business process (optional)")
+    @ApiModelProperty(value = "ID of originating business process")
     private String businessProcessID;
 
     @ApiModelProperty(value = "Description and purpose of data channel")
@@ -52,6 +52,16 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "use advanced filter - default false")
     private boolean useAdvancedFilters = false;
 
+    @ApiModelProperty(value = "step conter negotiation")
+    private int negotiationStepcounter = 0;
+
+    @ApiModelProperty(value = "seller messages on negotiation")
+    private String negotiationSellerMessages = "";
+
+    @ApiModelProperty(value = "buyer messages on negotiation")
+    private String negotiationBuyerMessages = "";
+
+    
     @NotNull
     @ElementCollection(targetClass = Sensor.class)
     @ApiModelProperty(value = "Associated sensors")
@@ -62,7 +72,10 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "Associated private Server configurations")
     private Set<Server> associatedServers = new HashSet<>();
 
-//$$tbd Negoziation
+    @NotNull
+    @ElementCollection(targetClass = NegotiationHistory.class)
+    @ApiModelProperty(value = "Associated history of negotiation steps")
+    private Set<NegotiationHistory> associatedNegotiationHistory = new HashSet<>();
 
     public ChannelConfiguration() {
 
@@ -166,6 +179,42 @@ public class ChannelConfiguration {
 
     public void setUseAdvancedFilters(boolean useAdvancedFilters) {
         this.useAdvancedFilters = useAdvancedFilters;
+    }
+
+    public int getNegotiationStepcounter() {
+        return negotiationStepcounter;
+    }
+
+    public void setNegotiationStepcounter(int negotiationStepcounter) {
+        this.negotiationStepcounter = negotiationStepcounter;
+    }
+
+    public void setNextNegotiationStepcounter() {
+        this.negotiationStepcounter++;
+    }
+
+    public String getNegotiationSellerMessages() {
+        return negotiationSellerMessages;
+    }
+
+    public void setNegotiationSellerMessages(String negotiationSellerMessages) {
+        this.negotiationSellerMessages = negotiationSellerMessages;
+    }
+
+    public String getNegotiationBuyerMessages() {
+        return negotiationBuyerMessages;
+    }
+
+    public void setNegotiationBuyerMessages(String negotiationBuyerMessages) {
+        this.negotiationBuyerMessages = negotiationBuyerMessages;
+    }
+
+    public Set<NegotiationHistory> getAssociatedNegotiationHistory() {
+        return associatedNegotiationHistory;
+    }
+
+    public void setAssociatedNegotiationHistory(Set<NegotiationHistory> associatedNegotiationHistory) {
+        this.associatedNegotiationHistory = associatedNegotiationHistory;
     }
 
 }

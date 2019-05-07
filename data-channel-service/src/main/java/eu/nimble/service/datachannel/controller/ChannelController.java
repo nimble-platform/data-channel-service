@@ -6,11 +6,13 @@ import eu.nimble.service.datachannel.entity.ChannelConfiguration;
 import eu.nimble.service.datachannel.entity.Machine;
 import eu.nimble.service.datachannel.entity.Sensor;
 import eu.nimble.service.datachannel.entity.Server;
+import eu.nimble.service.datachannel.entity.NegotiationHistory;
 import eu.nimble.service.datachannel.kafka.KafkaDomainClient;
 import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
 import eu.nimble.service.datachannel.repository.MachineRepository;
 import eu.nimble.service.datachannel.repository.SensorRepository;
 import eu.nimble.service.datachannel.repository.ServerRepository;
+import eu.nimble.service.datachannel.repository.NegotiationHistoryRepository;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import request.CreateChannel;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.*;
@@ -56,6 +60,9 @@ public class ChannelController implements ChannelAPI{
 
     @Autowired
     private ServerRepository serverRepository;
+
+    @Autowired
+    private NegotiationHistoryRepository negotiationHistoryRepository;
 
     @Autowired
     private MachineRepository machineRepository;
@@ -135,6 +142,139 @@ public class ChannelController implements ChannelAPI{
         return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
     }
 
+
+    //--------------------------------------------------------------------------------------
+    // setAdvancedConfig
+    //--------------------------------------------------------------------------------------
+    public ResponseEntity<?> setAdvancedConfig (
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(value = "usePrivateServers", required = true)
+            @RequestParam boolean usePrivateServers,
+            @ApiParam(value = "privateServersType", required = true)
+            @RequestParam String privateServersType,
+            @ApiParam(value = "useAdvancedFilters", required = true)
+            @RequestParam boolean useAdvancedFilters,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException {
+
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        channelConfiguration.setPrivateServersType(privateServersType);
+        channelConfiguration.setUsePrivateServers(usePrivateServers);
+        channelConfiguration.setUseAdvancedFilters(useAdvancedFilters);
+        channelConfigurationRepository.save(channelConfiguration);
+
+        logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
+        return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
+    }
+
+
+    //--------------------------------------------------------------------------------------
+    // nextNegotiationStep
+    //--------------------------------------------------------------------------------------
+    public ResponseEntity<?> setNextNegotiationStepForChannel(
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(value = "sellerMessage", required = false)
+            @RequestParam String sellerMessage,
+            @ApiParam(value = "buyerMessage", required = false)
+            @RequestParam String buyerMessage,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException {
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (sellerMessage!=null &&   !"".equals(sellerMessage) && sellerMessage.length()>0) {
+            channelConfiguration.setNegotiationSellerMessages(sellerMessage);
+        }
+        
+        if (buyerMessage!=null &&   !"".equals(buyerMessage) && buyerMessage.length()>0) {
+            channelConfiguration.setNegotiationBuyerMessages(buyerMessage);
+        }
+        
+        NegotiationHistory negotiationHistory = new NegotiationHistory();
+        negotiationHistory.setOwnership(companyID);
+        negotiationHistory.setStep( channelConfiguration.getNegotiationStepcounter() );
+        negotiationHistory.setJsonSnapshot(this.printJsonFormatChannel(channelConfiguration));
+        negotiationHistory.setCreatedDateTime(new java.util.Date() );
+        negotiationHistory = negotiationHistoryRepository.save(negotiationHistory);
+        
+        Set<NegotiationHistory> configuredNegotiationHistory = channelConfiguration.getAssociatedNegotiationHistory();
+        configuredNegotiationHistory.add(negotiationHistory);
+        
+        channelConfiguration.setNextNegotiationStepcounter();
+
+        channelConfigurationRepository.save(channelConfiguration);
+
+        logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
+        return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
+    }
+
+    //--------------------------------------------------------------------------------------
+    // getChannelFromNegotiationStep
+    //--------------------------------------------------------------------------------------
+    public ResponseEntity<?> getChannelFromNegotiationStep (
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(value = "step", required = true)
+            @PathVariable int step,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException {
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        NegotiationHistory negotiationHistory=null;
+        Set<NegotiationHistory> configuredNegotiationHistory = channelConfiguration.getAssociatedNegotiationHistory();
+        for(NegotiationHistory n : configuredNegotiationHistory) {
+            if (n.getStep() == step) {
+                negotiationHistory=n;
+                break;
+            }
+        }
+        
+        ChannelConfiguration channelConfigurationFromHistory = null;
+        if ( negotiationHistory!= null) {
+            channelConfigurationFromHistory = getChannelfromJson( negotiationHistory.getJsonSnapshot() );
+        }
+        
+        logger.info("Company {} requested channelConfiguration from history ID {} and step {}", companyID, channelID, step);
+        return new ResponseEntity<>(channelConfigurationFromHistory, HttpStatus.OK);
+    }
+
+    
+    
     //--------------------------------------------------------------------------------------
     // startChannel
     //--------------------------------------------------------------------------------------
@@ -232,7 +372,9 @@ public class ChannelController implements ChannelAPI{
 
         String companyID = identityResolver.resolveCompanyId(bearer); // extract ID of company
         ChannelConfiguration channel = this.channelConfigurationRepository.findOneByBusinessProcessID(businessProcessID);
+        printJsonFormatChannel(channel);
 
+        
         logger.info("Company {} requested associated channels for business process with ID {}", companyID, businessProcessID);
         return new ResponseEntity<>(channel, HttpStatus.OK);
     }
@@ -499,4 +641,30 @@ public class ChannelController implements ChannelAPI{
         return channelConfiguration.getBuyerCompanyID().equals(companyID)
                 || channelConfiguration.getSellerCompanyID().contains(companyID);
     }
+    
+    private String printJsonFormatChannel(ChannelConfiguration channelConfiguration) {
+        String jsonStr="{}";
+        ObjectMapper mapperObj = new ObjectMapper();
+        try {
+            // get Employee object as a json string
+            jsonStr = mapperObj.writeValueAsString(channelConfiguration);
+            System.out.println(jsonStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
+        return jsonStr;
+    }
+    private ChannelConfiguration getChannelfromJson(String jsonStr) {
+        ChannelConfiguration channelConfiguration = null;
+        ObjectMapper mapperObj = new ObjectMapper();
+        try {
+            // get Employee object as a json string
+            channelConfiguration = mapperObj.readValue(jsonStr, ChannelConfiguration.class);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
+        return channelConfiguration;
+    }
+    
 }

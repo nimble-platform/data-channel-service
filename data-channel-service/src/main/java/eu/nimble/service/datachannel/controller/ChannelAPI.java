@@ -396,4 +396,101 @@ public interface ChannelAPI {
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;
 
+    //--------------------------------------------------------------------------------------
+    // Negotiation
+    //--------------------------------------------------------------------------------------
+     /**
+     * See API documentation
+     *
+     * @param channelID Identifier of requested channel.
+     * @param sellerMessage optional message from seller
+     * @param buyerMessage optional message from buyer
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Do a negotiation step.",
+            notes = "Do a negotiation step", nickname = "doNegotiationStep")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Step done", response = Object.class),
+            @ApiResponse(code = 204, message = "No Content"),
+            @ApiResponse(code = 400, message = "Error while fetching channel"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Channel not found") })
+    @RequestMapping(value = "/{channelID}/doNegotiationStep", method = RequestMethod.POST)
+    public ResponseEntity<?> setNextNegotiationStepForChannel(
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(value = "sellerMessage", required = false)
+            @RequestParam String sellerMessage,
+            @ApiParam(value = "buyerMessage", required = false)
+            @RequestParam String buyerMessage,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
+     /**
+     * See API documentation
+     *
+     * @param channelID Identifier of requested channel.
+     * @param step Identify the step in history negotiation.
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Get instance in the history of channel negotiation by step.",
+            notes = "get a negotiation step", nickname = "getChannelFromNegotiationStep")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Step done", response = ChannelConfiguration.class),
+            @ApiResponse(code = 204, message = "No Content"),
+            @ApiResponse(code = 400, message = "Error while fetching channel"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Channel not found") })
+    @RequestMapping(value = "/{channelID}/getChannelFromNegotiationStep/{step}", method = RequestMethod.POST)
+    public ResponseEntity<?> getChannelFromNegotiationStep (
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(value = "step", required = true)
+            @PathVariable int step,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
+
+    /**
+     * See API documentation
+     *
+     * @param channelID Identifier of requested channel.
+     * @param usePrivateServers
+     * @param privateServersType
+     * @param useAdvancedFilters
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Set Advanced config",
+            notes = "Set Advanced config", nickname = "setAdvancedConfig")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Channel Saved", response = ChannelConfiguration.class),
+            @ApiResponse(code = 204, message = "No Content"),
+            @ApiResponse(code = 400, message = "Error while fetching channel"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Channel not found") })
+    @RequestMapping(value = "/{channelID}/setAdvancedConfig", method = RequestMethod.POST)
+    public ResponseEntity<?> setAdvancedConfig (
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(value = "usePrivateServers", required = true)
+            @RequestParam boolean usePrivateServers,
+            @ApiParam(value = "privateServersType", required = true)
+            @RequestParam String privateServersType,
+            @ApiParam(value = "useAdvancedFilters", required = true)
+            @RequestParam boolean useAdvancedFilters,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
 }
