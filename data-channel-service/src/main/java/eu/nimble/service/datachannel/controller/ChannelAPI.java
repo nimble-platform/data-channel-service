@@ -430,6 +430,37 @@ public interface ChannelAPI {
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;
 
+
+    //--------------------------------------------------------------------------------------
+    // renegotiate
+    //--------------------------------------------------------------------------------------
+    /**
+     * See API documentation
+     *
+     * @param channelID Identifier of requested channel.
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Do a negotiation step.",
+            notes = "Do a negotiation step", nickname = "doNegotiationStep")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Renegotiated", response = Object.class),
+            @ApiResponse(code = 204, message = "No Content"),
+            @ApiResponse(code = 400, message = "Error while fetching channel"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Channel not found") })
+    @RequestMapping(value = "/{channelID}/renegotiate/{steps}", method = RequestMethod.POST)
+    public ResponseEntity<?> renegotiate(
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer,
+            @ApiParam(value = "steps", required = true)
+            @PathVariable int steps)
+            throws IOException, UnirestException;
+
      /**
      * See API documentation
      *
@@ -465,7 +496,8 @@ public interface ChannelAPI {
      * @param channelID Identifier of requested channel.
      * @param usePrivateServers
      * @param privateServersType
-     * @param useAdvancedFilters
+     * @param hostRequest
+     * @param additionalNotes
      * @param bearer    OpenID Connect token storing requesting identity
      * @return See API documentation
      * @throws UnirestException Error while communication with the Identity Service
@@ -487,8 +519,10 @@ public interface ChannelAPI {
             @RequestParam boolean usePrivateServers,
             @ApiParam(value = "privateServersType", required = true)
             @RequestParam String privateServersType,
-            @ApiParam(value = "useAdvancedFilters", required = true)
-            @RequestParam boolean useAdvancedFilters,
+            @ApiParam(value = "hostRequest", required = true)
+            @RequestParam boolean hostRequest,
+            @ApiParam(value = "additionalNotes", required = true)
+            @RequestParam String additionalNotes,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;

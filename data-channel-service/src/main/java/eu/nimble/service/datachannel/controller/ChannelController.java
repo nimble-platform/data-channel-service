@@ -153,8 +153,10 @@ public class ChannelController implements ChannelAPI{
             @RequestParam boolean usePrivateServers,
             @ApiParam(value = "privateServersType", required = true)
             @RequestParam String privateServersType,
-            @ApiParam(value = "useAdvancedFilters", required = true)
-            @RequestParam boolean useAdvancedFilters,
+            @ApiParam(value = "hostRequest", required = true)
+            @RequestParam boolean hostRequest,
+            @ApiParam(value = "additionalNotes", required = true)
+            @RequestParam String additionalNotes,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException {
@@ -172,8 +174,9 @@ public class ChannelController implements ChannelAPI{
         }
 
         channelConfiguration.setPrivateServersType(privateServersType);
+        channelConfiguration.setHostRequest(hostRequest);
+        channelConfiguration.setAdditionalNotes(additionalNotes);
         channelConfiguration.setUsePrivateServers(usePrivateServers);
-        channelConfiguration.setUseAdvancedFilters(useAdvancedFilters);
         channelConfigurationRepository.save(channelConfiguration);
 
         logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
@@ -188,9 +191,9 @@ public class ChannelController implements ChannelAPI{
             @ApiParam(value = "channelID", required = true)
             @PathVariable String channelID,
             @ApiParam(value = "sellerMessage", required = false)
-            @RequestParam String sellerMessage,
+            @RequestParam(required = false) String sellerMessage,
             @ApiParam(value = "buyerMessage", required = false)
-            @RequestParam String buyerMessage,
+            @RequestParam(required = false) String buyerMessage,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException {
@@ -230,6 +233,53 @@ public class ChannelController implements ChannelAPI{
 
         logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
         return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
+    }
+
+    //--------------------------------------------------------------------------------------
+    // nextNegotiationStep
+    //--------------------------------------------------------------------------------------
+    public ResponseEntity<?> renegotiate(
+            @ApiParam(value = "channelID", required = true)
+            @PathVariable String channelID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer,
+            @ApiParam(value = "steps", required = true)
+            @PathVariable int steps)
+            throws IOException, UnirestException
+    {
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        if (isAuthorized(channelConfiguration, companyID) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String JsonChannel = this.printJsonFormatChannel(channelConfiguration);
+        java.util.Date currentDate = new java.util.Date();
+        Set<NegotiationHistory> configuredNegotiationHistory = channelConfiguration.getAssociatedNegotiationHistory();
+        for (int num = 0; num < steps; num++)
+        {
+            NegotiationHistory negotiationHistory = new NegotiationHistory();
+            negotiationHistory.setOwnership(companyID);
+            negotiationHistory.setStep(channelConfiguration.getNegotiationStepcounter());
+            negotiationHistory.setJsonSnapshot(JsonChannel);
+            negotiationHistory.setCreatedDateTime(currentDate);
+            negotiationHistory = negotiationHistoryRepository.save(negotiationHistory);
+
+            configuredNegotiationHistory.add(negotiationHistory);
+
+            channelConfiguration.setNextNegotiationStepcounter();
+        }
+
+        channelConfigurationRepository.save(channelConfiguration);
+
+        logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
+        return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
+
     }
 
     //--------------------------------------------------------------------------------------
@@ -335,7 +385,6 @@ public class ChannelController implements ChannelAPI{
 
         channelConfiguration.setEndDateTime( new java.util.Date() );
         channelConfigurationRepository.save(channelConfiguration);
-        // if not private close channel in the Kafka domain -> this will be moved to Channel.start()
         logger.info("Company {} requested closing of channel with ID {}", companyID, channelID);
         return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
     }
@@ -370,7 +419,7 @@ public class ChannelController implements ChannelAPI{
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException {
 
-        String companyID = identityResolver.resolveCompanyId(bearer); // extract ID of company
+        String companyID = identityResolver.resolveCompanyId(bearer);
         ChannelConfiguration channel = this.channelConfigurationRepository.findOneByBusinessProcessID(businessProcessID);
         printJsonFormatChannel(channel);
 

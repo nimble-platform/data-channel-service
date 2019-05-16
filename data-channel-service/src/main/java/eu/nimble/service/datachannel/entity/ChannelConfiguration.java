@@ -49,8 +49,11 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
     private String privateServersType;
 
-    @ApiModelProperty(value = "use advanced filter - default false")
-    private boolean useAdvancedFilters = false;
+    @ApiModelProperty(value = "request the other party to host a database")
+    private boolean hostRequest = false;
+
+    @ApiModelProperty(value = "additonal notes for database negotiation")
+    private String additionalNotes = "";
 
     @ApiModelProperty(value = "step conter negotiation")
     private int negotiationStepcounter = 0;
@@ -173,12 +176,20 @@ public class ChannelConfiguration {
         this.associatedServers = associatedServers;
     }
 
-    public boolean isUseAdvancedFilters() {
-        return useAdvancedFilters;
+    public boolean getHostRequest() {
+        return hostRequest;
     }
 
-    public void setUseAdvancedFilters(boolean useAdvancedFilters) {
-        this.useAdvancedFilters = useAdvancedFilters;
+    public void setHostRequest(boolean hostRequest) {
+        this.hostRequest = hostRequest;
+    }
+
+    public String getAdditionalNotes() {
+        return additionalNotes;
+    }
+
+    public void setAdditionalNotes(String additionalNotes) {
+        this.additionalNotes = additionalNotes;
     }
 
     public int getNegotiationStepcounter() {
