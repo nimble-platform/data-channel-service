@@ -422,10 +422,16 @@ public interface ChannelAPI {
     public ResponseEntity<?> setNextNegotiationStepForChannel(
             @ApiParam(value = "channelID", required = true)
             @PathVariable String channelID,
+            @ApiParam(value = "usePrivateServers", required = true)
+            @RequestParam boolean usePrivateServers,
             @ApiParam(value = "sellerMessage", required = false)
             @RequestParam String sellerMessage,
             @ApiParam(value = "buyerMessage", required = false)
             @RequestParam String buyerMessage,
+            @ApiParam(value = "sellerServerType", required = false)
+            @RequestParam(required = false) String sellerServerType,
+            @ApiParam(value = "buyerServerType", required = false)
+            @RequestParam(required = false) String buyerServerType,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;
@@ -490,41 +496,41 @@ public interface ChannelAPI {
             throws IOException, UnirestException;
 
 
-    /**
-     * See API documentation
-     *
-     * @param channelID Identifier of requested channel.
-     * @param usePrivateServers
-     * @param privateServersType
-     * @param hostRequest
-     * @param additionalNotes
-     * @param bearer    OpenID Connect token storing requesting identity
-     * @return See API documentation
-     * @throws UnirestException Error while communication with the Identity Service
-     */
-    @ApiOperation(value = "Set Advanced config",
-            notes = "Set Advanced config", nickname = "setAdvancedConfig")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Channel Saved", response = ChannelConfiguration.class),
-            @ApiResponse(code = 204, message = "No Content"),
-            @ApiResponse(code = 400, message = "Error while fetching channel"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "Channel not found") })
-    @RequestMapping(value = "/{channelID}/setAdvancedConfig", method = RequestMethod.POST)
-    public ResponseEntity<?> setAdvancedConfig (
-            @ApiParam(value = "channelID", required = true)
-            @PathVariable String channelID,
-            @ApiParam(value = "usePrivateServers", required = true)
-            @RequestParam boolean usePrivateServers,
-            @ApiParam(value = "privateServersType", required = true)
-            @RequestParam String privateServersType,
-            @ApiParam(value = "hostRequest", required = true)
-            @RequestParam boolean hostRequest,
-            @ApiParam(value = "additionalNotes", required = true)
-            @RequestParam String additionalNotes,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer)
-            throws IOException, UnirestException;
+    ///**
+    // * See API documentation
+    // *
+    // * @param channelID Identifier of requested channel.
+    // * @param usePrivateServers
+    // * @param privateServersType
+    // * @param hostRequest
+    // * @param additionalNotes
+    // * @param bearer    OpenID Connect token storing requesting identity
+    // * @return See API documentation
+    // * @throws UnirestException Error while communication with the Identity Service
+    // */
+    //@ApiOperation(value = "Set Advanced config",
+    //        notes = "Set Advanced config", nickname = "setAdvancedConfig")
+    //@ApiResponses(value = {
+    //        @ApiResponse(code = 200, message = "Channel Saved", response = ChannelConfiguration.class),
+    //        @ApiResponse(code = 204, message = "No Content"),
+    //        @ApiResponse(code = 400, message = "Error while fetching channel"),
+    //        @ApiResponse(code = 401, message = "Unauthorized"),
+    //        @ApiResponse(code = 403, message = "Forbidden"),
+    //        @ApiResponse(code = 404, message = "Channel not found") })
+    //@RequestMapping(value = "/{channelID}/setAdvancedConfig", method = RequestMethod.POST)
+    //public ResponseEntity<?> setAdvancedConfig (
+    //        @ApiParam(value = "channelID", required = true)
+    //        @PathVariable String channelID,
+    //        @ApiParam(value = "usePrivateServers", required = true)
+    //        @RequestParam boolean usePrivateServers,
+    //        @ApiParam(value = "privateServersType", required = true)
+    //        @RequestParam String privateServersType,
+    //        @ApiParam(value = "hostRequest", required = true)
+    //        @RequestParam boolean hostRequest,
+    //        @ApiParam(value = "additionalNotes", required = true)
+    //        @RequestParam String additionalNotes,
+    //        @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+    //        @RequestHeader(value = "Authorization") String bearer)
+    //        throws IOException, UnirestException;
 
 }

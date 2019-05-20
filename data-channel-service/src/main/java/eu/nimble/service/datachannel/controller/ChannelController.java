@@ -146,42 +146,42 @@ public class ChannelController implements ChannelAPI{
     //--------------------------------------------------------------------------------------
     // setAdvancedConfig
     //--------------------------------------------------------------------------------------
-    public ResponseEntity<?> setAdvancedConfig (
-            @ApiParam(value = "channelID", required = true)
-            @PathVariable String channelID,
-            @ApiParam(value = "usePrivateServers", required = true)
-            @RequestParam boolean usePrivateServers,
-            @ApiParam(value = "privateServersType", required = true)
-            @RequestParam String privateServersType,
-            @ApiParam(value = "hostRequest", required = true)
-            @RequestParam boolean hostRequest,
-            @ApiParam(value = "additionalNotes", required = true)
-            @RequestParam String additionalNotes,
-            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
-            @RequestHeader(value = "Authorization") String bearer)
-            throws IOException, UnirestException {
-
-
-        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
-        if (channelConfiguration == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // check if request is authorized
-        String companyID = identityResolver.resolveCompanyId(bearer);
-        if (isAuthorized(channelConfiguration, companyID) == false) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        channelConfiguration.setPrivateServersType(privateServersType);
-        channelConfiguration.setHostRequest(hostRequest);
-        channelConfiguration.setAdditionalNotes(additionalNotes);
-        channelConfiguration.setUsePrivateServers(usePrivateServers);
-        channelConfigurationRepository.save(channelConfiguration);
-
-        logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
-        return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
-    }
+    //public ResponseEntity<?> setAdvancedConfig (
+    //        @ApiParam(value = "channelID", required = true)
+    //        @PathVariable String channelID,
+    //        @ApiParam(value = "usePrivateServers", required = true)
+    //        @RequestParam boolean usePrivateServers,
+    //        @ApiParam(value = "privateServersType", required = true)
+    //        @RequestParam String privateServersType,
+    //        @ApiParam(value = "hostRequest", required = true)
+    //        @RequestParam boolean hostRequest,
+    //        @ApiParam(value = "additionalNotes", required = true)
+    //        @RequestParam String additionalNotes,
+    //        @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+    //        @RequestHeader(value = "Authorization") String bearer)
+    //        throws IOException, UnirestException {
+    //
+    //
+    //    ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+    //    if (channelConfiguration == null) {
+    //        return ResponseEntity.notFound().build();
+    //    }
+    //
+    //    // check if request is authorized
+    //    String companyID = identityResolver.resolveCompanyId(bearer);
+    //    if (isAuthorized(channelConfiguration, companyID) == false) {
+    //        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    //    }
+    //
+    //    channelConfiguration.setPrivateServersType(privateServersType);
+    //    channelConfiguration.setHostRequest(hostRequest);
+    //    channelConfiguration.setAdditionalNotes(additionalNotes);
+    //    channelConfiguration.setUsePrivateServers(usePrivateServers);
+    //    channelConfigurationRepository.save(channelConfiguration);
+    //
+    //    logger.info("Company {} requested nextStep of Negotiation for channel with ID {}", companyID, channelID);
+    //    return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
+    //}
 
 
     //--------------------------------------------------------------------------------------
@@ -190,10 +190,16 @@ public class ChannelController implements ChannelAPI{
     public ResponseEntity<?> setNextNegotiationStepForChannel(
             @ApiParam(value = "channelID", required = true)
             @PathVariable String channelID,
+            @ApiParam(value = "usePrivateServers", required = true)
+            @RequestParam boolean usePrivateServers,
             @ApiParam(value = "sellerMessage", required = false)
             @RequestParam(required = false) String sellerMessage,
             @ApiParam(value = "buyerMessage", required = false)
             @RequestParam(required = false) String buyerMessage,
+            @ApiParam(value = "sellerServerType", required = false)
+            @RequestParam(required = false) String sellerServerType,
+            @ApiParam(value = "buyerServerType", required = false)
+            @RequestParam(required = false) String buyerServerType,
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException {
@@ -216,6 +222,17 @@ public class ChannelController implements ChannelAPI{
         if (buyerMessage!=null &&   !"".equals(buyerMessage) && buyerMessage.length()>0) {
             channelConfiguration.setNegotiationBuyerMessages(buyerMessage);
         }
+
+        if (buyerServerType!=null &&   !"".equals(buyerServerType) && buyerServerType.length()>0) {
+            channelConfiguration.setBuyerServersType(buyerServerType);
+        }
+
+        if (sellerServerType!=null &&   !"".equals(sellerServerType) && sellerServerType.length()>0) {
+            channelConfiguration.setSellerServersType(sellerServerType);
+        }
+
+        channelConfiguration.setUsePrivateServers(usePrivateServers);
+
         
         NegotiationHistory negotiationHistory = new NegotiationHistory();
         negotiationHistory.setOwnership(companyID);
@@ -236,7 +253,7 @@ public class ChannelController implements ChannelAPI{
     }
 
     //--------------------------------------------------------------------------------------
-    // nextNegotiationStep
+    // renegotiate
     //--------------------------------------------------------------------------------------
     public ResponseEntity<?> renegotiate(
             @ApiParam(value = "channelID", required = true)

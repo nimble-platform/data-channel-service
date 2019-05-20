@@ -47,13 +47,12 @@ public class ChannelConfiguration {
     private boolean usePrivateServers = true;
 
     @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
-    private String privateServersType;
+    private String buyerServersType = "MongoDB";
 
-    @ApiModelProperty(value = "request the other party to host a database")
-    private boolean hostRequest = false;
+    @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
+    private String sellerServersType = "MongoDB";
 
-    @ApiModelProperty(value = "additonal notes for database negotiation")
-    private String additionalNotes = "";
+
 
     @ApiModelProperty(value = "step conter negotiation")
     private int negotiationStepcounter = 0;
@@ -154,12 +153,18 @@ public class ChannelConfiguration {
         this.usePrivateServers = usePrivateServers;
     }
 
-    public String getPrivateServersType() {
-        return privateServersType;
+    public String getBuyerServersType() {
+        return buyerServersType;
+    }
+    public void setBuyerServersType(String privateServersType) {
+        this.buyerServersType = privateServersType;
     }
 
-    public void setPrivateServersType(String privateServersType) {
-        this.privateServersType = privateServersType;
+    public String getSellerServersType() {
+        return sellerServersType;
+    }
+    public void setSellerServersType(String privateServersType) {
+        this.sellerServersType = privateServersType;
     }
 
     public Set<Sensor> getAssociatedSensors() {
@@ -176,21 +181,6 @@ public class ChannelConfiguration {
         this.associatedServers = associatedServers;
     }
 
-    public boolean getHostRequest() {
-        return hostRequest;
-    }
-
-    public void setHostRequest(boolean hostRequest) {
-        this.hostRequest = hostRequest;
-    }
-
-    public String getAdditionalNotes() {
-        return additionalNotes;
-    }
-
-    public void setAdditionalNotes(String additionalNotes) {
-        this.additionalNotes = additionalNotes;
-    }
 
     public int getNegotiationStepcounter() {
         return negotiationStepcounter;
