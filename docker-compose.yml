@@ -1,45 +1,22 @@
-version: '2'
+version: '3'
+
 services:
 
-    data-channel-service:
-      image: nimbleplatform/data-channel-service
-      restart: always
-      environment:
-        SENSORTHINGS_SERVER_URL: http://gost:8080/v1.0/
-      ports:
+  datachannel-service:
+    image: "nimbleplatform/data-channel-service:latest"
+    ports:
         - "9099:9099"
-      depends_on:
-        - gost
-
-    gost-db:
-        image: geodan/gost-db:0.5
-        restart: always
-        volumes:
-          - postgis:/var/lib/postgresql/data
-        environment:
-          POSTGRES_DB: gost
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-    gost:
-        image: geodan/gost:0.5
-        restart: always
-        ports:
-          - "8080:8080"
-        volumes:
-          - gost_conf:/gostserver/config
-        depends_on:
-          - gost-db
-        environment:
-            gost_db_host: gost-db
-#            GOST_SERVER_EXTERNAL_URI: http://${HOSTNAME}:8082
-#            GOST_SERVER_MAX_ENTITIES: 200
-    gost-dashboard:
-        image: geodan/gost-dashboard:0.5
-        restart: always
-        ports:
-          - "8081:8080"
-        depends_on:
-          - gost
-volumes:
-    postgis: {}
-    gost_conf: {}
+    environment:
+      DATACHANNEL_DB_HOST: "dev-main-db"
+      DATACHANNEL_DB_HOST_PORT: "5432"
+      DATACHANNEL_DB_NAME: "datachanneldb"
+      DATACHANNEL_DB_USERNAME: "postgres"
+      DATACHANNEL_DB_PASSWORD: "postgres"
+      IDENTITY_SERVICE_URL: "http://identity-service/identity"
+      LOCAL_DATA_PIPE:
+      LOCAL_DCFS:
+      DATA_PIPE_URL:
+      DCFS_URL:
+    networks:
+      - infra
+    
