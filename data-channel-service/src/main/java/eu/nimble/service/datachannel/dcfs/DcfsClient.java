@@ -1,4 +1,4 @@
-package eu.nimble.service.datachannel.kafka;
+package eu.nimble.service.datachannel.dcfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
@@ -25,13 +25,15 @@ import java.util.Map;
  * @author Johannes Innerbichler
  */
 @Service
-public class KafkaDomainClient {
+public class DcfsClient {
 
-    private static Logger logger = LoggerFactory.getLogger(KafkaDomainClient.class);
+    @Value("${nimble.dcfs.service-url}")
+    private String DcfsUrl;
 
-    public CreateChannelResponse createChannel(String kafkaDomainUrl, ChannelConfiguration channelConfig) throws UnirestException {
+    private static Logger logger = LoggerFactory.getLogger(DcfsClient.class);
+
+    public CreateFilteredChannelResponse createChannel(ChannelConfiguration channelConfig) throws UnirestException {
  /*$$TBD for each Sensor
-        this.kafkaDomainUrl = kafkaDomainUrl;
         String sourceID = channelConfig.getProducerCompanyID();
         String targetID = channelConfig.getConsumerCompanyIDs().stream().findFirst().get();
 
@@ -46,7 +48,7 @@ public class KafkaDomainClient {
         body.accumulate("filter", jsonFilter);
 
         // create channel in Kafka domain
-        HttpResponse<String> response = Unirest.post(kafkaDomainUrl + "/start-new")
+        HttpResponse<String> response = Unirest.post(dcfsDomainUrl + "/start-new-filtered")
                 .header("Content-Type", "application/json")
                 .body(body)
                 .asString();
@@ -57,16 +59,16 @@ public class KafkaDomainClient {
         return new CreateChannelResponse(jsonResponse.getString("channelId"), jsonResponse.getString("inputTopic"),
                 jsonResponse.getString("outputTopic"));
 */   
-        return new CreateChannelResponse("", true);
+        return new CreateFilteredChannelResponse("", true);
 }
 
     @SuppressWarnings("unused")
-    public static class CreateChannelResponse {
+    public static class CreateFilteredChannelResponse {
 
         private String channelId;
         private boolean hasErrors;
 
-        public CreateChannelResponse(String channelId, boolean hasErrors) {
+        public CreateFilteredChannelResponse(String channelId, boolean hasErrors) {
             this.channelId = channelId;
             this.hasErrors = hasErrors;
         }
