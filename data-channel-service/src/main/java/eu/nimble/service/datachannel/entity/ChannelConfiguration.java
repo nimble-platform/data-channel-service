@@ -218,4 +218,28 @@ public class ChannelConfiguration {
         this.associatedNegotiationHistory = associatedNegotiationHistory;
     }
 
+    @JsonIgnore
+    public boolean isOnLastPage() {
+        return negotiationStepcounter % 5 == 3;
+    }
+
+    @JsonIgnore
+    public boolean isChannelOpened()
+    {
+        if (startDateTime == null) {
+            return false;
+        }
+
+        if (endDateTime == null) {
+            return true;
+        }
+
+        if (startDateTime.after(endDateTime)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
