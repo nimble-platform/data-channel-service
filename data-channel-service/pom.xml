@@ -45,17 +45,11 @@
             <id>jinnerbi</id>
             <name>Johannes Innerbichler</name>
         </developer>
+        <developer>
+            <id>a.musumeci</id>
+            <name>Andrea Musumeci</name>
+        </developer>
     </developers>
-
-    <!--repositories>
-        <repository>
-            <id>bintray-fraunhoferiosb-Maven</id>
-            <url>https://dl.bintray.com/fraunhoferiosb/Maven</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories-->
 
     <dependencyManagement>
         <dependencies>
@@ -156,11 +150,6 @@
             <artifactId>spring-security-jwt</artifactId>
             <version>1.0.9.RELEASE</version>
         </dependency>
-        <!--dependency>
-            <groupId>de.fraunhofer.iosb.ilt</groupId>
-            <artifactId>FROST-Client</artifactId>
-            <version>0.17</version>
-        </dependency-->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import request.CreateChannel;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Api(value = "channel", description = "the channel API")
 public interface ChannelAPI {
@@ -103,7 +104,7 @@ public interface ChannelAPI {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Channel started", response = Object.class),
             @ApiResponse(code = 204, message = "No Content"),
-            @ApiResponse(code = 400, message = "Error while closing channel"),
+            @ApiResponse(code = 400, message = "Error while starting channel"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Channel not found") })
@@ -299,6 +300,36 @@ public interface ChannelAPI {
             @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
             @RequestHeader(value = "Authorization") String bearer)
             throws IOException, UnirestException;
+
+    /**
+     * See API documentation
+     *
+     * @param channelID Identifier of requested channel.
+     * @param sensorID  ID of sensor to be used
+     * @param bearer    OpenID Connect token storing requesting identity
+     * @return See API documentation
+     * @throws UnirestException Error while communication with the Identity Service
+     */
+    @ApiOperation(value = "Verify if a channel or a sensor can be used by the logged user",
+            notes = "", nickname = "isAuthorized")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "user is autorized", response = Object.class),
+            @ApiResponse(code = 204, message = "No Content"),
+            @ApiResponse(code = 400, message = "Error while fetching channel"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Sensor or channel not found") })
+    @RequestMapping(value = "/isAuthorized", method = RequestMethod.POST)
+    ResponseEntity<?> isAuthorized(
+            @ApiParam(value = "ID of channel", required = true)
+            @RequestParam String channelID,
+            @ApiParam(value = "optional SensorID to be verified", required = false)
+            @RequestParam Optional<Long> sensorID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer)
+            throws IOException, UnirestException;
+
+
 
     /**
      * See API documentation

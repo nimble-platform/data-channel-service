@@ -698,12 +698,59 @@ public class ChannelController implements ChannelAPI{
     //--------------------------------------------------------------------------------------
     // isAuthorized
     //--------------------------------------------------------------------------------------
-    private Boolean isAuthorized(CreateChannel.Request createChannelRequest, String companyID) {
+    public ResponseEntity<?> isAuthorized(
+            @ApiParam(value = "channelID", required = true)
+            @RequestParam String channelID,
+            @ApiParam(value = "SensorID", required = false)
+            @RequestParam Optional<Long> sensorID,
+            @ApiParam(name = "Authorization", value = "OpenID Connect token containing identity of requester", required = true)
+            @RequestHeader(value = "Authorization") String bearer) throws IOException, UnirestException {
+
+        boolean auth = false;
+
+        ChannelConfiguration channelConfiguration = channelConfigurationRepository.findOneByChannelID(channelID);
+        if (channelConfiguration == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // check if request is authorized
+        String companyID = identityResolver.resolveCompanyId(bearer);
+        auth = isAuthorized(channelConfiguration, companyID);
+        if ( !auth ) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (sensorID.isPresent()) {
+            auth = false;
+
+            // remove sensor from channel
+            Iterator iSensors = channelConfiguration.getAssociatedSensors().iterator();
+            while (iSensors.hasNext()) {
+                if ( ((Sensor)  iSensors.next() ).getId().equals( sensorID.get() ) ) {
+                    auth = true;
+                    break;
+                }
+            }
+        }
+        if (auth)
+            return new ResponseEntity<>(HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+
+
+
+
+    //--------------------------------------------------------------------------------------
+    // isAuthorized
+    //--------------------------------------------------------------------------------------
+    private boolean isAuthorized(CreateChannel.Request createChannelRequest, String companyID) {
         return createChannelRequest.getBuyerCompanyID().equals(companyID)
                 || createChannelRequest.getSellerCompanyID().contains(companyID);
     }
 
-    private Boolean isAuthorized(ChannelConfiguration channelConfiguration, String companyID) {
+    private boolean isAuthorized(ChannelConfiguration channelConfiguration, String companyID) {
         return channelConfiguration.getBuyerCompanyID().equals(companyID)
                 || channelConfiguration.getSellerCompanyID().contains(companyID);
     }
