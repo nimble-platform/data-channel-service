@@ -733,7 +733,7 @@ public class ChannelController implements ChannelAPI{
             }
         }
         if (auth)
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(companyID, HttpStatus.OK);
         else
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
