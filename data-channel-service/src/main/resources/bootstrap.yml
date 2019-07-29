@@ -42,6 +42,7 @@ nimble:
     identity-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
   kafka-domain:
     service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
+  platformHost: ${DATA_CHANNEL_SERVICE_URL:http://localhost:9099}
 
 logging:
   level:
