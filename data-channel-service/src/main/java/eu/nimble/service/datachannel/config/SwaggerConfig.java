@@ -1,5 +1,6 @@
 package eu.nimble.service.datachannel.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -13,9 +14,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+
+    @Value("${nimble.platformHost}")
+    private String platformHost;
     @Bean
     public Docket api() {
+
+        platformHost = platformHost.replace("https://", "");
+        platformHost = platformHost.replace("http://","");
+
         return new Docket(DocumentationType.SWAGGER_2)
+                .host(platformHost)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("eu.nimble"))
                 .paths(PathSelectors.any())
