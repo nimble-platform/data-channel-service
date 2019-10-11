@@ -7,7 +7,7 @@ import eu.nimble.service.datachannel.entity.Machine;
 import eu.nimble.service.datachannel.entity.Sensor;
 import eu.nimble.service.datachannel.entity.Server;
 import eu.nimble.service.datachannel.entity.NegotiationHistory;
-import eu.nimble.service.datachannel.kafka.KafkaDomainClient;
+import eu.nimble.service.datachannel.internaldatachannel.InternalDataChannelClient;
 import eu.nimble.service.datachannel.repository.ChannelConfigurationRepository;
 import eu.nimble.service.datachannel.repository.MachineRepository;
 import eu.nimble.service.datachannel.repository.SensorRepository;
@@ -50,7 +50,7 @@ public class ChannelController implements ChannelAPI{
     private IdentityResolver identityResolver;
 
     @Autowired
-    private KafkaDomainClient kafkaDomainClient;
+    private InternalDataChannelClient kafkaDomainClient;
 
     @Autowired
     private ChannelConfigurationRepository channelConfigurationRepository;
@@ -366,9 +366,12 @@ public class ChannelController implements ChannelAPI{
         //$$ set Start Date and if internal create topics
         channelConfiguration.setStartDateTime( new java.util.Date() );
         channelConfigurationRepository.save(channelConfiguration);
+
         // if not private set up channel in the Kafka domain -> this will be moved to Channel.start()
-        //$$KafkaDomainClient.CreateChannelResponse response = kafkaDomainClient.createChannel(config);
-        //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
+        if (!channelConfiguration.isUsePrivateServers()) {
+            InternalDataChannelClient.CreateChannelResponse response = kafkaDomainClient.createChannel(channelConfiguration);
+            //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
+        }
 
 
         logger.info("Company {} requested starting of channel with ID {}", companyID, channelID);
@@ -737,9 +740,6 @@ public class ChannelController implements ChannelAPI{
         else
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
-
-
-
 
 
     //--------------------------------------------------------------------------------------

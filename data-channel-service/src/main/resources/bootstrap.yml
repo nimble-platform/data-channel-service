@@ -26,8 +26,8 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${DATACHANNEL_DB_HOST:localhost}:${DATACHANNEL_DB_HOST_PORT:5432}/${DATACHANNEL_DB_NAME:datachanneldb}
-    username: ${DATACHANNEL_DB_USERNAME:root}
-    password: ${DATACHANNEL_DB_PASSWORD:changeme}
+    username: ${DATACHANNEL_DB_USERNAME:nimble}
+    password: ${DATACHANNEL_DB_PASSWORD:nimble}
     maxActive: 2
     maxIdle: 2
 logstash:
@@ -39,7 +39,7 @@ nimble:
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
   identity:
-    identity-url: ${IDENTITY_SERVICE_URL:http://localhost:9092}
+    identity-url: ${IDENTITY_SERVICE_URL:https://nimble-platform.salzburgresearch.at/nimble/identity}
   kafka-domain:
     service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
 

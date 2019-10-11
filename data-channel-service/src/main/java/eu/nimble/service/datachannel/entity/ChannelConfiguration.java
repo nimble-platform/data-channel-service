@@ -46,10 +46,10 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "private or internal; server - default true")
     private boolean usePrivateServers = true;
 
-    @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
+    @ApiModelProperty(value = "Type of private servers (internaldatachannel, mongodb, etc)")
     private String buyerServersType = "MongoDB";
 
-    @ApiModelProperty(value = "Type of private servers (kafka, mongodb, etc)")
+    @ApiModelProperty(value = "Type of private servers (internaldatachannel, mongodb, etc)")
     private String sellerServersType = "MongoDB";
 
 
