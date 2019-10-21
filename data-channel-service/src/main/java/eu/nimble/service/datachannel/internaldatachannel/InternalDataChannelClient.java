@@ -32,7 +32,6 @@ public class InternalDataChannelClient {
         Iterator<Sensor> iSensor = sensors.iterator();
         boolean hasErrors = false;
 
-        /*
         String createChannelUrl = localDataPipe+"/manage/createInternalChannelTopic?idDataChannel="+channelConfig.getChannelID();
 
         HttpResponse<String> response = Unirest.post(createChannelUrl)
@@ -40,7 +39,9 @@ public class InternalDataChannelClient {
                 .asString();
 
         hasErrors = hasErrors || response.getStatus()!=200;
-        */
+
+        if (hasErrors)
+            return hasErrors;
 
         while (iSensor.hasNext()) {
 

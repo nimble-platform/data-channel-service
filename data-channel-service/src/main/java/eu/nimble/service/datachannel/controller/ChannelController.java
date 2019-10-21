@@ -50,7 +50,7 @@ public class ChannelController implements ChannelAPI{
     private IdentityResolver identityResolver;
 
     @Autowired
-    private InternalDataChannelClient kafkaDomainClient;
+    private InternalDataChannelClient internalDataChannelClient;
 
     @Autowired
     private ChannelConfigurationRepository channelConfigurationRepository;
@@ -369,7 +369,7 @@ public class ChannelController implements ChannelAPI{
 
         // if not private set up channel in the Kafka domain -> this will be moved to Channel.start()
         if (!channelConfiguration.isUsePrivateServers()) {
-            InternalDataChannelClient.CreateChannelResponse response = kafkaDomainClient.createChannel(channelConfiguration);
+            boolean response = internalDataChannelClient.createChannel(channelConfiguration);
             //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
         }
 
