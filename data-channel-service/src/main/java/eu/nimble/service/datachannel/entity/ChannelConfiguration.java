@@ -32,6 +32,9 @@ public class ChannelConfiguration {
     @ApiModelProperty(value = "ID of originating business process")
     private String businessProcessID;
 
+    @ApiModelProperty(value = "ID of product, originating from the business process")
+    private String productID;
+
     @ApiModelProperty(value = "Description and purpose of data channel")
     private String description;
 
@@ -82,11 +85,12 @@ public class ChannelConfiguration {
     public ChannelConfiguration() {
 
     }
-    public ChannelConfiguration(String businessProcessID, String sellerCompanyID, String buyerCompanyID, String description) {
+    public ChannelConfiguration(String businessProcessID, String sellerCompanyID, String buyerCompanyID, String description, String productID) {
         setSellerCompanyID(sellerCompanyID);
         setBuyerCompanyID(buyerCompanyID);
         setDescription(description);
         setBusinessProcessID(businessProcessID);
+        setProductID(productID);
     }
 
     public Long getId() {
@@ -105,6 +109,14 @@ public class ChannelConfiguration {
     }
     public void setSellerCompanyID(String sellerCompanyID) {
         this.sellerCompanyID = sellerCompanyID;
+    }
+
+    public String getProductID() {
+        return productID;
+    }
+
+    public void setProductID(String productID) {
+        this.productID = productID;
     }
 
     public String getBuyerCompanyID() {
