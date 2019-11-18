@@ -36,12 +36,12 @@ logstash:
 nimble:
   corsEnabled: false
   data-channel:
+    datachannelapikey: ${DATACHANNELAPIKEY:nimbledatachannelapikey}
     sensorthings:
       url: ${SENSORTHINGS_SERVER_URL:http://localhost:8080/v1.0/}
   identity:
     identity-url: ${IDENTITY_SERVICE_URL:https://nimble-platform.salzburgresearch.at/nimble/identity}
-  kafka-domain:
-    service-url: ${KAFKA_DOMAIN_URL:http://localhost:1000}
+  datapipe-service: ${DATAPIPE_SERVICE:http://localhost:21300}
 
 logging:
   level:

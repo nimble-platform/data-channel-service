@@ -5,10 +5,10 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.nimble.service.datachannel.entity.ChannelConfiguration;
 import eu.nimble.service.datachannel.entity.Sensor;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -22,8 +22,11 @@ import java.util.Set;
 @Service
 public class InternalDataChannelClient {
 
-    @Value("${nimble.datachannel.local-datapipe-service}")
-    private String localDataPipe;
+    @Value("${nimble.datachannel.datapipe-service}")
+    private String dataPipeService;
+
+    @Value("${nimble.datachannel.datachannelapikey}")
+    private String datachannelapikey;
 
     private static Logger logger = LoggerFactory.getLogger(InternalDataChannelClient.class);
 
@@ -32,10 +35,10 @@ public class InternalDataChannelClient {
         Iterator<Sensor> iSensor = sensors.iterator();
         boolean hasErrors = false;
 
-        String createChannelUrl = localDataPipe+"/manage/createInternalChannelTopic?idDataChannel="+channelConfig.getChannelID();
+        String createChannelUrl = dataPipeService +"/manage/createInternalChannelTopic?idDataChannel="+channelConfig.getChannelID();
 
         HttpResponse<String> response = Unirest.post(createChannelUrl)
-                .header("Content-Type", "application/json")
+                .header("Content-Type", "application/json").header(HttpHeaders.AUTHORIZATION, datachannelapikey)
                 .asString();
 
         hasErrors = hasErrors || response.getStatus()!=200;
@@ -45,9 +48,9 @@ public class InternalDataChannelClient {
 
         while (iSensor.hasNext()) {
 
-            String createSensorUrl = localDataPipe+"/manage/createInternalSensorTopic?idDataChannel="+channelConfig.getChannelID()+"&idSensor="+iSensor.next().getId();
+            String createSensorUrl = dataPipeService +"/manage/createInternalSensorTopic?idDataChannel="+channelConfig.getChannelID()+"&idSensor="+iSensor.next().getId();
             HttpResponse<String> responseSensor = Unirest.post(createSensorUrl)
-                    .header("Content-Type", "application/json")
+                    .header("Content-Type", "application/json").header(HttpHeaders.AUTHORIZATION, datachannelapikey)
                     .asString();
 
             hasErrors = hasErrors || responseSensor.getStatus()!=200;
