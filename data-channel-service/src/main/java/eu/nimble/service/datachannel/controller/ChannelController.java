@@ -110,8 +110,7 @@ public class ChannelController implements ChannelAPI{
                 createChannelRequest.getBusinessProcessID(),
                 createChannelRequest.getSellerCompanyID(),
                 createChannelRequest.getBuyerCompanyID(),
-                createChannelRequest.getDescription(),
-                createChannelRequest.getProductID());
+                createChannelRequest.getDescription());
 
         config = channelConfigurationRepository.save(config);
         logger.info("Company {} opened channel ", createChannelRequest.getSellerCompanyID());
