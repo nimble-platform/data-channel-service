@@ -363,18 +363,14 @@ public class ChannelController implements ChannelAPI{
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        //$$ set Start Date and if internal create topics
         channelConfiguration.setStartDateTime( new java.util.Date() );
         channelConfigurationRepository.save(channelConfiguration);
-
-        // if not private set up channel in the Kafka domain -> this will be moved to Channel.start()
+        boolean responseCreate = true;
         if (!channelConfiguration.isUsePrivateServers()) {
-            boolean response = internalDataChannelClient.createChannel(channelConfiguration);
-            //$$DcfsClient.CreateFilteredChannelResponse response = dcfsClient.createFilteredChannel(config);
+            responseCreate = internalDataChannelClient.createChannel(channelConfiguration);
         }
 
-
-        logger.info("Company {} requested starting of channel with ID {}", companyID, channelID);
+        logger.info("Company {} requested starting of channel with ID {} - response {}", companyID, channelID, responseCreate);
         return new ResponseEntity<>(channelConfiguration, HttpStatus.OK);
     }
 
