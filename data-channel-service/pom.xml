@@ -30,7 +30,7 @@
         <springfox.version>2.5.0</springfox.version>
         <default.package>eu.nimble.service.datachannel</default.package>
         <dockerImageTag>${project.version}</dockerImageTag>
-        <resteasy.version>3.0.14.Final</resteasy.version>
+        <resteasy.version>4.5.7.Final</resteasy.version>
     </properties>
 
     <parent>
